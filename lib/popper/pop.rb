@@ -29,8 +29,8 @@ module Popper
 
     def self.match_rule?(profile, mail)
       profile.rules.to_h.keys.find do |rule|
-        profile.rules.send(rule).condition.to_h.any? do |k,v|
-          mail.send(k).match(/#{v}/)
+        profile.rules.send(rule).condition.to_h.all? do |k,v|
+          mail.send(k).to_s.match(/#{v}/)
         end
       end
     end
