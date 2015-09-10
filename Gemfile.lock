@@ -2,13 +2,44 @@ PATH
   remote: .
   specs:
     popper (0.1.0)
+      mail
+      slack-notifier
       thor
+      toml
 
 GEM
   remote: https://rubygems.org/
   specs:
+    blankslate (2.1.2.4)
+    diff-lcs (1.2.5)
+    mail (2.5.4)
+      mime-types (~> 1.16)
+      treetop (~> 1.4.8)
+    mime-types (1.25.1)
+    parslet (1.5.0)
+      blankslate (~> 2.0)
+    polyglot (0.3.5)
     rake (10.4.2)
+    rspec (3.3.0)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
+    rspec-core (3.3.2)
+      rspec-support (~> 3.3.0)
+    rspec-expectations (3.3.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-mocks (3.3.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-support (3.3.0)
+    slack-notifier (1.2.1)
     thor (0.19.1)
+    toml (0.1.2)
+      parslet (~> 1.5.0)
+    treetop (1.4.15)
+      polyglot
+      polyglot (>= 0.3.1)
 
 PLATFORMS
   ruby
@@ -17,3 +48,4 @@ DEPENDENCIES
   bundler (~> 1.9)
   popper!
   rake (~> 10.0)
+  rspec

@@ -18,26 +18,35 @@ To post a variety of services by analyzing the email
 ## ~/popper/popper.conf
 ```
 [popper]
-git_token = token
-ghe_token = token
-ghe_url   = url
+git_token = "token"
+ghe_token = "token"
+ghe_url   = "http://git.example.com"
 
-slack_webhook_url = webhook_url
+slack_webhook_url = "webhook_url"
+slack_user = "slack"
 
 [example1.login]
-user = example1@example.com
-password = password
+server = "example.com"
+# port = 110(default)
+user = "example1@example.com"
+password = "password"
 
-[example1.match]
-subject = .*match_word.*
-body = .*match_word.*
 
-[example1.action]
-slack = #channel_name
-git = orgs/repo
+[example.login]
+server = "mail.example.co.jp"
+user = "example user"
+password = "************"
+
+[example.rules.normal_log.condition]
+subject = ".*Webmailer Exception.*"
+
+[example.rules.normal_log.action.slack]
+channel = "#channel"
+mentions = ["@user"]
+message = "webmailer error mail"
 
 [example2.login]
-user = example2@example.com
+user = "example2@example.com"
 ...
 ```
 

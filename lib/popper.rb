@@ -1,5 +1,9 @@
+require 'thor'
+require 'toml'
+require 'ostruct'
+require 'pp'
 require "popper/version"
 require "popper/cli"
-
-module Popper
-end
+require 'popper/pop'
+require "popper/config"
+require "popper/slack"
