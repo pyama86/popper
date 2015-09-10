@@ -25,21 +25,18 @@ ghe_url   = "http://git.example.com"
 slack_webhook_url = "webhook_url"
 slack_user = "slack"
 
-[example1.login]
+# [config_name].login
+[example.login]
 server = "example.com"
 # port = 110(default)
-user = "example1@example.com"
+user = "example@example.com"
 password = "password"
 
-
-[example.login]
-server = "mail.example.co.jp"
-user = "example user"
-password = "************"
-
+# [config_name].rules.[rule_name].condition
 [example.rules.normal_log.condition]
 subject = ".*Webmailer Exception.*"
 
+# [config_name].rules.[rule_name].action.[action_name]
 [example.rules.normal_log.action.slack]
 channel = "#channel"
 mentions = ["@user"]
