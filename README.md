@@ -7,30 +7,38 @@ To post a variety of services by analyzing the email
   $ gem install popper
 
 # usage
-`~/.procmailrc`
+  $ popper init
+
+`crontab -l`
 ```
-* ^To: example1@example.com
-| /path/to/popper
+* * * * * /path/to/popper
 ```
 
 # configure
-## /etc/popper.conf
+## ~/popper/popper.conf
 ```
 [popper]
-git_token = your token
-
-ghe_token = your token
-ghe_url   = your token
+git_token = token
+ghe_token = token
+ghe_url   = url
 
 slack_webhook_url = webhook_url
 
-[example1@example.com.match]
+[example1.login]
+user = example1@example.com
+password = password
+
+[example1.match]
 subject = .*match_word.*
 body = .*match_word.*
 
-[example1@example.com.action]
+[example1.action]
 slack = #channel_name
 git = orgs/repo
+
+[example2.login]
+user = example2@example.com
+...
 ```
 
 # option

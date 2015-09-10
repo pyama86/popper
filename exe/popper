@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "popper"
+Popper::CLI.start

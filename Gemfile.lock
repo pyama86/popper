@@ -1,0 +1,19 @@
+PATH
+  remote: .
+  specs:
+    popper (0.1.0)
+      thor
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (10.4.2)
+    thor (0.19.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.9)
+  popper!
+  rake (~> 10.0)
