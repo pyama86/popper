@@ -61,7 +61,7 @@ module Popper
 
       File.write(File.join(path), uidl.join("\n")) if uidl
 
-      @_uidl[account] ||= File.read(path).split(/\r?\n/) if File.exist?(path)
+      @_uidl[account] ||= File.exist?(path) ? File.read(path).split(/\r?\n/) : []
       @_uidl[account]
     end
   end
