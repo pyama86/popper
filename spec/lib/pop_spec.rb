@@ -6,6 +6,7 @@ describe Popper::Pop do
     options = {}
     options[:config] = 'spec/fixture/popper.conf'
     allow(Logger).to receive(:new).and_return(Dummy.new)
+    allow(File).to receive(:write).and_return(true)
     Popper.load_config(options)
     Popper.init_logger(options)
   end
