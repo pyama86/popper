@@ -6,13 +6,16 @@ describe Popper::Pop do
     options = {}
     options[:config] = 'spec/fixture/popper.conf'
     Popper.load_config(options)
+    Popper.init_logger(options)
+    allow_any_instance_of(Logger).to receive(:info).and_return(true)
+    allow_any_instance_of(Logger).to receive(:warn).and_return(true)
   end
 
   describe 'run' do
     before do
       allow(Net::POP3).to receive(:start).and_yield(dummy_pop)
       expect_any_instance_of(Slack::Notifier).to receive(:ping).with(
-        "test message @test\nGitHubUrl:https://test.git.com/v3/issues/#123",
+        "test message @test git:https://test.git.com/v3/issues/#123",
         {
           attachments: [
             {
