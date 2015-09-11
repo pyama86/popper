@@ -4,7 +4,11 @@ module Popper::Action
   class Git < Base
     def self.run(config, mail, params={})
       if action?(config)
-        url = octkit.create_issue(my_conf(config).repo, mail.subject.force_encoding('utf-8'), mail.body.to_s.force_encoding('utf-8'))
+        url = octkit.create_issue(
+          my_conf(config).repo,
+          mail.subject,
+          mail.body.decoded.encode("UTF-8", mail.charset)
+        )
       end
       params["#{self.action}_url".to_sym] = url[:html_url] if url
       next_run(config, mail, params)
