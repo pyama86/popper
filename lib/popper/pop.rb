@@ -19,11 +19,31 @@ module Popper
             end
           end
         rescue => e
-          Popper.log.warning e
+          Popper.log.warn e
         end
 
         last_uidl(profile.name, uidls)
         Popper.log.info "success popper #{profile.name}"
+      end
+    end
+
+    def self.prepop
+      Popper.configure.account.each do |profile|
+        uidls = []
+        begin
+          Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
+            Popper.log.info "start prepop #{profile.name}"
+            puts "start prepop #{profile.name}"
+            pop.mails.each do |m|
+              uidls << m.uidl
+            end
+          end
+        rescue => e
+          puts e
+        end
+
+        last_uidl(profile.name, uidls)
+        puts "success prepop #{profile.name}"
       end
     end
 
