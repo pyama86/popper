@@ -5,25 +5,25 @@ module Popper
     def self.run
       Popper.configure.account.each do |profile|
         uidls = []
-        Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
-          puts "start popper #{profile.name}"
-          pop.mails.each do |m|
-            uidls << m.uidl
-            next if last_uidl(profile.name).include?(m.uidl)
-            mail = Mail.new(m.mail)
-            if rule = match_rule?(profile, mail)
-              execute_action(profile, mail, rule)
+        begin
+          Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
+            Popper.log.info "start popper #{profile.name}"
+            pop.mails.each do |m|
+              uidls << m.uidl
+              next if last_uidl(profile.name).include?(m.uidl)
+              mail = Mail.new(m.mail)
+              if rule = match_rule?(profile, mail)
+                Popper.log.info "match mail #{mail.subject}"
+                Popper::Action::Git.run(profile.rules.send(rule).action, mail)
+              end
             end
           end
+        rescue => e
+          Popper.log.warning e
         end
-        last_uidl(account, uidls)
-        puts "success popper #{profile.name}"
-      end
-    end
 
-    def self.execute_action(profile, mail, rule)
-      profile.rules.send(rule).action.to_h.keys.each do |action_name|
-        const_get("Popper::#{action_name.to_s.capitalize!}").run(profile.rules.send(rule).action.send(action_name) , mail)
+        last_uidl(profile.name, uidls)
+        Popper.log.info "success popper #{profile.name}"
       end
     end
 

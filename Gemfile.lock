@@ -3,6 +3,7 @@ PATH
   specs:
     popper (0.1.0)
       mail
+      octokit
       slack-notifier
       thor
       toml
@@ -10,12 +11,18 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.3.8)
     blankslate (2.1.2.4)
     diff-lcs (1.2.5)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.25.1)
+    multipart-post (2.0.0)
+    octokit (4.0.1)
+      sawyer (~> 0.6.0, >= 0.5.3)
     parslet (1.5.0)
       blankslate (~> 2.0)
     polyglot (0.3.5)
@@ -33,6 +40,9 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    sawyer (0.6.0)
+      addressable (~> 2.3.5)
+      faraday (~> 0.8, < 0.10)
     slack-notifier (1.2.1)
     thor (0.19.1)
     toml (0.1.2)

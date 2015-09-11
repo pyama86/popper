@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'slack-notifier'
   spec.add_dependency 'toml'
   spec.add_dependency 'mail'
+  spec.add_dependency 'octokit'
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec"

@@ -1,3 +1,6 @@
+require 'toml'
+require 'ostruct'
+require 'logger'
 module Popper
   class Config
     attr_reader :popper, :account
@@ -43,4 +46,5 @@ module Popper
   def self.configure
     @_config
   end
+
 end
