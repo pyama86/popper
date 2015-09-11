@@ -7,8 +7,18 @@ To post a variety of services by analyzing the email
   $ gem install popper
 
 # usage
+  # create ~/popper/popper.conf
   $ popper init
-
+  
+  # edit popper.conf
+  $ vi ~/popper/popper.conf
+  
+  # pop uidl prefetch
+  # to avoid duplication and to fetch the uidl
+  $ popper prepop
+  
+  $ popper
+  
 `crontab -l`
 ```
 * * * * * /path/to/popper
@@ -41,6 +51,9 @@ subject = ".*Webmailer Exception.*"
 channel = "#channel"
 mentions = ["@user"]
 message = "webmailer error mail"
+
+[example.rules.normal_log.action.git]
+repo = "example/fuu"
 
 [example2.login]
 user = "example2@example.com"
