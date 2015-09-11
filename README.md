@@ -1,4 +1,7 @@
 # popper
+
+[![Build Status](https://travis-ci.org/pyama86/popper.svg)](https://travis-ci.org/pyama86/popper)
+
 To post a variety of services by analyzing the email
 * slack notification
 * create issue to github.com or ghe

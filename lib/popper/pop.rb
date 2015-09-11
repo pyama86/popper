@@ -6,8 +6,8 @@ module Popper
       Popper.configure.account.each do |profile|
         uidls = []
         begin
+          Popper.log.info "start popper #{profile.name}"
           Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
-            Popper.log.info "start popper #{profile.name}"
             pop.mails.each do |m|
               uidls << m.uidl
               next if last_uidl(profile.name).include?(m.uidl)
@@ -31,8 +31,8 @@ module Popper
       Popper.configure.account.each do |profile|
         uidls = []
         begin
+          Popper.log.info "start prepop #{profile.name}"
           Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
-            Popper.log.info "start prepop #{profile.name}"
             puts "start prepop #{profile.name}"
             pop.mails.each do |m|
               uidls << m.uidl
