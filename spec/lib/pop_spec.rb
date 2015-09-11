@@ -5,10 +5,9 @@ describe Popper::Pop do
   before do
     options = {}
     options[:config] = 'spec/fixture/popper.conf'
+    allow(Logger).to receive(:new).and_return(Dummy.new)
     Popper.load_config(options)
     Popper.init_logger(options)
-    allow_any_instance_of(Logger).to receive(:info).and_return(true)
-    allow_any_instance_of(Logger).to receive(:warn).and_return(true)
   end
 
   describe 'run' do
@@ -46,6 +45,16 @@ describe Popper::Pop do
   end
 end
 
+class Dummy
+  def info(v)
+    true
+  end
+
+  def warn(v)
+    true
+  end
+end
+
 def dummy_pop
   pop = Object.new
   def pop.mails
@@ -63,8 +72,6 @@ Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network)
   end
   pop
 end
-
-
 
 def ok_mail
   mail = Mail.new
