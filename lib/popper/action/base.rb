@@ -3,6 +3,20 @@ module Popper::Action
     @next_action = nil
     @action = nil
 
+    def self.run(config, mail, params={})
+      if action?(config)
+        begin
+          Popper.log.info "run action #{self.action}"
+          params = task(config, mail, params)
+          Popper.log.info "exit action #{self.action}"
+        rescue => e
+          Popper.log.warn e
+          Popper.log.warn e.backtrace
+        end
+      end
+      next_run(config, mail, params)
+    end
+
     def self.next_action(action=nil)
       @next_action = action if action
       @next_action

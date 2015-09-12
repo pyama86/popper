@@ -10,7 +10,9 @@ module Popper
           Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
             pop.mails.each do |m|
               uidls << m.uidl
+
               next if last_uidl(profile.name).include?(m.uidl)
+
               mail = Mail.new(m.mail)
               if rule = match_rule?(profile, mail)
                 Popper.log.info "match mail #{mail.subject}"
@@ -29,21 +31,20 @@ module Popper
 
     def self.prepop
       Popper.configure.account.each do |profile|
-        uidls = []
         begin
-          Popper.log.info "start prepop #{profile.name}"
+          puts "start prepop #{profile.name}"
+          uidls = []
           Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
-            puts "start prepop #{profile.name}"
-            pop.mails.each do |m|
-              uidls << m.uidl
-            end
+            uidls = pop.mails.map(&:uidl)
+            last_uidl(
+              profile.name,
+              uidls
+            )
           end
         rescue => e
           puts e
         end
-
-        last_uidl(profile.name, uidls)
-        puts "success prepop #{profile.name}"
+        puts "success prepop #{profile.name} mail count:#{uidls.count}"
       end
     end
 

@@ -1,33 +1,31 @@
 require 'slack-notifier'
 module Popper::Action
   class Slack < Base
-    def self.run(config, mail, params={})
-      if action?(config)
-        notifier = ::Slack::Notifier.new(
-          Popper.configure.popper.slack_webhook_url,
-          channel: my_conf(config).channel,
-          username: Popper.configure.popper.slack_user,
-          link_names: 1
-        )
-        note = {
-          pretext: mail.date.to_s,
-          text: mail.subject,
-          color: "good"
-        }
+    def self.task(config, mail, params={})
+      notifier = ::Slack::Notifier.new(
+        Popper.configure.popper.slack_webhook_url,
+        channel: my_conf(config).channel,
+        username: Popper.configure.popper.slack_user,
+        link_names: 1
+      )
 
-        body = my_conf(config).message || "popper mail notification"
-        body += " #{my_conf(config).mentions.join(" ")}" if my_conf(config).mentions
+      note = {
+        pretext: mail.date.to_s,
+        text: mail.subject,
+        color: "good"
+      }
 
-        %w(
-          git
-          ghe
-        ).each do |name|
-          body += " #{name}:#{params[(name + '_url').to_sym]}" if params[(name + '_url').to_sym]
-        end
-        notifier.ping body, attachments: [note]
+      body = my_conf(config).message || "popper mail notification"
+      body += " #{my_conf(config).mentions.join(" ")}" if my_conf(config).mentions
+
+      %w(
+        git
+        ghe
+      ).each do |name|
+        body += " #{name}:#{params[(name + '_url').to_sym]}" if params[(name + '_url').to_sym]
       end
 
-      next_run(config, mail, params)
+      notifier.ping body, attachments: [note]
     end
 
     def self.check_params(config)

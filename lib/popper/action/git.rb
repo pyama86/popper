@@ -2,16 +2,14 @@
 require 'octokit'
 module Popper::Action
   class Git < Base
-    def self.run(config, mail, params={})
-      if action?(config)
-        url = octkit.create_issue(
-          my_conf(config).repo,
-          mail.subject,
-          mail.body.decoded.encode("UTF-8", mail.charset)
-        )
-      end
+    def self.task(config, mail, params={})
+      url = octkit.create_issue(
+        my_conf(config).repo,
+        mail.subject,
+        mail.body.decoded.encode("UTF-8", mail.charset)
+      )
       params["#{self.action}_url".to_sym] = url[:html_url] if url
-      next_run(config, mail, params)
+      params
     end
 
     def self.octkit
@@ -20,7 +18,8 @@ module Popper::Action
     end
 
     def self.check_params(config)
-      my_conf(config).respond_to?(:repo) && Popper.configure.popper.respond_to?(:git_token)
+      my_conf(config).respond_to?(:repo) &&
+      Popper.configure.popper.respond_to?(:git_token)
     end
 
     next_action(Ghe)
