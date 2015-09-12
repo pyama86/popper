@@ -5,6 +5,7 @@ require 'popper/pop'
 require "popper/config"
 require "popper/action"
 require "popper/init"
+require "popper/sync"
 
 module Popper
   def self.init_logger(options)
