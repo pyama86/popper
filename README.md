@@ -10,18 +10,19 @@ To post a variety of services by analyzing the email
   $ gem install popper
 
 # usage
+```
   # create ~/popper/popper.conf
   $ popper init
-  
+
   # edit popper.conf
   $ vi ~/popper/popper.conf
-  
+
   # pop uidl prefetch
   # to avoid duplication and to fetch the uidl
   $ popper prepop
-  
+
   $ popper
-  
+```
 `crontab -l`
 ```
 * * * * * /path/to/popper
