@@ -18,7 +18,7 @@ module Popper
                   mail = Mail.new(m.mail)
                   if rule = match_rule?(profile, mail)
                     Popper.log.info "match mail #{mail.subject}"
-                    Popper::Action::Git.run(profile.rules.send(rule).action, mail)
+                    Popper::Action::Git.run(profile.rules.send(rule).action, mail) if profile.rules.send(rule).respond_to?(:action)
                   end
                 end
               end
@@ -38,7 +38,7 @@ module Popper
     def self.match_rule?(profile, mail)
       profile.rules.to_h.keys.find do |rule|
         profile.rules.send(rule).condition.to_h.all? do |k,v|
-          mail.send(k).to_s.match(/#{v}/)
+          mail.respond_to?(k) && mail.send(k).to_s.match(/#{v}/)
         end
       end
     end
