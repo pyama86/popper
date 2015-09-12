@@ -11,8 +11,6 @@ module Popper
               Popper.log.info "start popper #{profile.name}"
               Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
                 pop.mails.each do |m|
-                  uidls << m.uidl
-
                   next if last_uidl(profile.name).include?(m.uidl)
 
                   mail = Mail.new(m.mail)
@@ -20,13 +18,14 @@ module Popper
                     Popper.log.info "match mail #{mail.subject}"
                     Popper::Action::Git.run(profile.rules.send(rule).action, mail) if profile.rules.send(rule).respond_to?(:action)
                   end
+                  uidls << m.uidl
                 end
               end
-              last_uidl(profile.name, uidls)
               Popper.log.info "success popper #{profile.name}"
             rescue => e
               Popper.log.warn e
             end
+            last_uidl(profile.name, uidls)
           end
         end
       rescue Locked
