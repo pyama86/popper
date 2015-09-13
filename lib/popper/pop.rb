@@ -36,10 +36,11 @@ module Popper
     end
 
     def self.connection(profile, &block)
-      Net::POP3.start(profile.login.server,
-                      profile.login.port || 110,
-                      profile.login.user,
-                      profile.login.password
+      Net::POP3.start(
+        profile.login.server,
+        profile.login.port || 110,
+        profile.login.user,
+        profile.login.password
       ) do |pop|
         block.call(pop)
       end
