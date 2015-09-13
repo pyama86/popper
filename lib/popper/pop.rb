@@ -20,9 +20,7 @@ module Popper
       Popper.log.info "start popper #{profile.name}"
 
       connection(profile) do |pop|
-        pop.mails.each do |m|
-          next if last_uidl(profile.name).include?(m.uidl)
-
+        pop.mails.reject {|m| last_uidl(profile.name).include?(m.uidl) }.each do |m|
           mail = Mail.new(m.mail)
           if rule = match_rule?(profile, mail)
             Popper.log.info "match mail #{mail.subject}"
@@ -83,7 +81,6 @@ module Popper
         end
       end
     end
-
   end
 end
 
