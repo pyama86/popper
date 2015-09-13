@@ -6,25 +6,7 @@ module Popper
       begin
         Popper::Sync.synchronized do
           Popper.configure.account.each do |profile|
-            uidls = []
-            begin
-              Popper.log.info "start popper #{profile.name}"
-              Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
-                pop.mails.each do |m|
-                  next if last_uidl(profile.name).include?(m.uidl)
-
-                  mail = Mail.new(m.mail)
-                  if rule = match_rule?(profile, mail)
-                    Popper.log.info "match mail #{mail.subject}"
-                    Popper::Action::Git.run(profile.rules.send(rule).action, mail) if profile.rules.send(rule).respond_to?(:action)
-                  end
-                  uidls << m.uidl
-                end
-              end
-              Popper.log.info "success popper #{profile.name}"
-            rescue => e
-              Popper.log.warn e
-            end
+            uidls = pop(profile)
             last_uidl(profile.name, uidls)
           end
         end
@@ -33,6 +15,30 @@ module Popper
       end
     end
 
+    def self.pop(profile)
+      uidls = []
+      begin
+        Popper.log.info "start popper #{profile.name}"
+
+        Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
+          pop.mails.each do |m|
+            next if last_uidl(profile.name).include?(m.uidl)
+
+            mail = Mail.new(m.mail)
+            if rule = match_rule?(profile, mail)
+              Popper.log.info "match mail #{mail.subject}"
+              Popper::Action::Git.run(profile.rules.send(rule).action, mail) if profile.rules.send(rule).respond_to?(:action)
+            end
+            uidls << m.uidl
+          end
+        end
+        Popper.log.info "success popper #{profile.name}"
+      rescue => e
+        Popper.log.warn e
+        uidls
+      end
+      uidls
+    end
 
     def self.match_rule?(profile, mail)
       profile.rules.to_h.keys.find do |rule|
@@ -60,18 +66,17 @@ module Popper
       Popper.configure.account.each do |profile|
         begin
           puts "start prepop #{profile.name}"
-          uidls = []
           Net::POP3.start(profile.login.server, profile.login.port || 110, profile.login.user, profile.login.password) do |pop|
             uidls = pop.mails.map(&:uidl)
             last_uidl(
               profile.name,
               uidls
             )
+            puts "success prepop #{profile.name} mail count:#{uidls.count}"
           end
         rescue => e
           puts e
         end
-        puts "success prepop #{profile.name} mail count:#{uidls.count}"
       end
     end
   end
