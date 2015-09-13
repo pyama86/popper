@@ -3,9 +3,9 @@ module Popper::Action
   class Slack < Base
     def self.task(config, mail, params={})
       notifier = ::Slack::Notifier.new(
-        Popper.configure.popper.slack_webhook_url,
-        channel: my_conf(config).channel,
-        username: Popper.configure.popper.slack_user,
+        my_config.webhook_url,
+        channel: my_config.channel,
+        username: my_config.user || 'popper',
         link_names: 1
       )
 
@@ -15,9 +15,8 @@ module Popper::Action
         color: "good"
       }
 
-      body = my_conf(config).message || "popper mail notification"
-      body += " #{my_conf(config).mentions.join(" ")}" if my_conf(config).mentions
-
+      body = my_config.message || "popper mail notification"
+      body += " #{my_config.mentions.join(" ")}" if my_config.mentions
       %w(
         git
         ghe
@@ -28,10 +27,9 @@ module Popper::Action
       notifier.ping body, attachments: [note]
     end
 
-    def self.check_params(config)
-      my_conf(config).respond_to?(:channel) &&
-      Popper.configure.popper.respond_to?(:slack_webhook_url) &&
-      Popper.configure.popper.respond_to?(:slack_user)
+    def self.check_params
+      my_config.respond_to?(:channel) &&
+      my_config.respond_to?(:webhook_url)
     end
 
     action(:slack)

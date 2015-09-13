@@ -28,35 +28,42 @@ To post a variety of services by analyzing the email
 * * * * * /path/to/popper
 ```
 
-# configure
+# configure(toml)
 ## ~/popper/popper.conf
 ```
-[popper]
-git_token = "token"
-ghe_token = "token"
-ghe_url   = "http://git.example.com"
+[default.condition]
 
-slack_webhook_url = "webhook_url"
-slack_user = "slack"
+subject = ["^(?!.*Re:).+$"]
+
+[default.action.slack]
+
+webhook_url = "webhook_url"
+user = "slack"
+channel = "#default_channel"
+message = "default message"
 
 # [config_name].login
 [example.login]
+
 server = "example.com"
-# port = 110(default)
 user = "example@example.com"
 password = "password"
+port = 110(default)
 
 # [config_name].rules.[rule_name].condition
 [example.rules.normal_log.condition]
-subject = ".*Webmailer Exception.*"
+
+subject = [".*Webmailer Exception.*"]
 
 # [config_name].rules.[rule_name].action.[action_name]
 [example.rules.normal_log.action.slack]
+
 channel = "#channel"
 mentions = ["@user"]
 message = "webmailer error mail"
 
 [example.rules.normal_log.action.git]
+
 repo = "example/fuu"
 
 [example2.login]

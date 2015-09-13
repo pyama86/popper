@@ -5,16 +5,14 @@ module Popper::Action
     def self.octkit
       Octokit.reset!
       Octokit.configure do |c|
-        c.web_endpoint = Popper.configure.popper.ghe_url
-        c.api_endpoint = File.join(Popper.configure.popper.ghe_url, "api/v3")
+        c.web_endpoint = my_config.url
+        c.api_endpoint = File.join(my_config.url, "api/v3")
       end
-      Octokit::Client.new(:access_token => Popper.configure.popper.ghe_token)
+      Octokit::Client.new(:access_token => my_config.token)
     end
 
-    def self.check_params(config)
-      my_conf(config).respond_to?(:repo) &&
-      Popper.configure.popper.respond_to?(:ghe_url) &&
-      Popper.configure.popper.respond_to?(:ghe_token)
+    def self.check_params
+      my_config.respond_to?(:url) && super
     end
 
     next_action(Slack)

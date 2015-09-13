@@ -36,8 +36,12 @@ module Popper
 
     def self.match_rule?(profile, mail)
       profile.rules.to_h.keys.find do |rule|
-        profile.rules.send(rule).condition.to_h.all? do |k,v|
-          mail.respond_to?(k) && mail.send(k).to_s.match(/#{v}/)
+        # merge default rule
+        rule_hash = Popper.configure.default.respond_to?(:condition) ? Popper.configure.default.condition.to_h : {}
+        rule_hash.deep_merge(profile.rules.send(rule).condition.to_h).all? do |header,conditions|
+          conditions.all? do |condition|
+            mail.respond_to?(header) && mail.send(header).to_s.match(/#{condition}/)
+          end
         end
       end
     end
@@ -70,5 +74,16 @@ module Popper
         puts "success prepop #{profile.name} mail count:#{uidls.count}"
       end
     end
+  end
+end
+
+class ::Hash
+  def deep_merge(second)
+    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : Array === v1 && Array === v2 ? v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
+    self.merge(second.to_h, &merger)
+  end
+
+  def deep_merge!(second)
+    self.merge!(deep_merge(second))
   end
 end

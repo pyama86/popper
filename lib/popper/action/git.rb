@@ -4,7 +4,7 @@ module Popper::Action
   class Git < Base
     def self.task(config, mail, params={})
       url = octkit.create_issue(
-        my_conf(config).repo,
+        my_config.repo,
         mail.subject,
         mail.body.decoded.encode("UTF-8", mail.charset)
       )
@@ -14,12 +14,12 @@ module Popper::Action
 
     def self.octkit
       Octokit.reset!
-      Octokit::Client.new(:access_token => Popper.configure.popper.git_token)
+      Octokit::Client.new(:access_token => my_config.token)
     end
 
-    def self.check_params(config)
-      my_conf(config).respond_to?(:repo) &&
-      Popper.configure.popper.respond_to?(:git_token)
+    def self.check_params
+      my_config.respond_to?(:repo) &&
+      my_config.respond_to?(:token)
     end
 
     next_action(Ghe)

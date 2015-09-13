@@ -2,9 +2,11 @@ module Popper::Action
   class Base
     @next_action = nil
     @action = nil
+    @_config = nil
 
     def self.run(config, mail, params={})
-      if action?(config)
+      set_config(config)
+      if action?
         begin
           Popper.log.info "run action #{self.action}"
           params = task(config, mail, params)
@@ -31,12 +33,28 @@ module Popper::Action
       @next_action.run(config, mail, params) if @next_action
     end
 
-    def self.action?(config)
-      config.to_h.has_key?(self.action) && check_params(config)
+    def self.action?
+      my_config && check_params
     end
 
-    def self.my_conf(config)
-      config.send(self.action.to_s)
+    def self.set_config(config)
+      action_hash = case
+      when Popper.configure.default.respond_to?(:action) && Popper.configure.default.action.respond_to?(self.action)
+        Popper.configure.default.action.send(self.action).to_h
+      else
+        {}
+      end
+
+      action_hash.deep_merge!(
+        config.send(self.action.to_s).to_h
+      ) if config.respond_to?(self.action)
+
+      @_config = OpenStruct.new(action_hash) 
+      @_config
+    end
+
+    def self.my_config
+      @_config
     end
 
     def self.check_params(config); end

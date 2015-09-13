@@ -10,6 +10,7 @@ require "popper/sync"
 module Popper
   def self.init_logger(options)
     log_path = options[:log] || File.join(Dir.home, "popper", "popper.log")
+    log_path = STDOUT if ENV["POPPER_TEST"]
     @_logger = Logger.new(log_path)
   end
 

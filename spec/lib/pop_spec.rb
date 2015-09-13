@@ -5,7 +5,6 @@ describe Popper::Pop do
   before do
     options = {}
     options[:config] = 'spec/fixture/popper.conf'
-    allow(Logger).to receive(:new).and_return(Dummy.new)
     allow(File).to receive(:open).and_yield(Dummy.new)
     allow(File).to receive(:write).and_return(true)
     Popper.load_config(options)
@@ -16,7 +15,7 @@ describe Popper::Pop do
     before do
       allow(Net::POP3).to receive(:start).and_yield(dummy_pop)
       expect_any_instance_of(Slack::Notifier).to receive(:ping).with(
-        "test message @test git:https://test.git.com/v3/issues/#123",
+        "test message @test git:https://test.git.com/v3/issues/#123 ghe:https://test.ghe.com/v3/issues/#123",
         {
           attachments: [
             {
@@ -27,13 +26,21 @@ describe Popper::Pop do
           ]
         }
       )
-
-      expect_any_instance_of(Octokit::Client).to receive(:create_issue).with(
+      # github
+      allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "test/example",
         "test example subject",
         "test example body\n",
       ).and_return(
         { html_url: "https://test.git.com/v3/issues/#123" }
+      )
+      # ghe
+      allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
+        "example/default",
+        "test example subject",
+        "test example body\n",
+      ).and_return(
+        { html_url: "https://test.ghe.com/v3/issues/#123" }
       )
     end
 
@@ -44,19 +51,12 @@ describe Popper::Pop do
     it { expect(described_class.match_rule?(Popper.configure.account.first, ok_mail)).to be_truthy }
     it { expect(described_class.match_rule?(Popper.configure.account.first, ng_body_mail)).to be_falsey }
     it { expect(described_class.match_rule?(Popper.configure.account.first, ng_mail)).to be_falsey }
+    it { expect(described_class.match_rule?(Popper.configure.account.first, reply_mail)).to be_falsey }
   end
 end
 
 class Dummy
   def flock(type)
-    true
-  end
-
-  def info(v)
-    true
-  end
-
-  def warn(v)
     true
   end
 end
@@ -97,5 +97,12 @@ def ng_mail
   mail = Mail.new
   mail.subject = "test nomatch subject"
   mail.body    = "test nomatch word"
+  mail
+end
+
+def reply_mail
+  mail = Mail.new
+  mail.subject = "Re: test example subject"
+  mail.body    = "test example word"
   mail
 end
