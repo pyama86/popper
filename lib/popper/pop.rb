@@ -24,7 +24,7 @@ module Popper
           mail = Mail.new(m.mail)
           if rule = match_rule?(profile, mail)
             Popper.log.info "match mail #{mail.subject}"
-            Popper::Action::Git.run(profile.rules.send(rule).action, mail) if profile.rules.send(rule).respond_to?(:action)
+            Popper::Action::Git.run(profile.action_by_rule(rule), mail) if profile.action_by_rule(rule)
           end
           uidls << m.uidl
         end
@@ -50,7 +50,7 @@ module Popper
       profile.rules.to_h.keys.find do |rule|
         # merge default rule
         rule_hash = Popper.configure.default.respond_to?(:condition) ? Popper.configure.default.condition.to_h : {}
-        rule_hash.deep_merge(profile.rules.send(rule).condition.to_h).all? do |header,conditions|
+        rule_hash.deep_merge(profile.condition_by_rule(rule).to_h).all? do |header,conditions|
           conditions.all? do |condition|
             mail.respond_to?(header) && mail.send(header).to_s.match(/#{condition}/)
           end

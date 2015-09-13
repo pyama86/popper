@@ -9,7 +9,6 @@ module Popper
 
       config = TOML.load_file(config_path)
       @default = AccountAttributes.new(config["default"]) if config["default"]
-
       @account = []
 
       config.select {|k,v| !%w(default).include?(k) }.each do |profile|
@@ -39,6 +38,13 @@ module Popper
       @hash_table
     end
 
+    def action_by_rule(rule)
+      self.rules.send(rule).action if rules.send(rule).respond_to?(:action)
+    end
+
+    def condition_by_rule(rule)
+      self.rules.send(rule).condition if rules.send(rule).respond_to?(:condition)
+    end
   end
 
   def self.load_config(options)
