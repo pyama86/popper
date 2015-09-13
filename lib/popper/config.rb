@@ -3,22 +3,22 @@ require 'ostruct'
 require 'logger'
 module Popper
   class Config
-    attr_reader :popper, :default, :account
+    attr_reader :default, :account
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
 
       config = TOML.load_file(config_path)
-      @popper  = OpenStruct.new(config["popper"])
       @default = AccountAttributes.new(config["default"]) if config["default"]
 
       @account = []
 
-      config.select {|k,v| !%w(popper default).include?(k) }.each do |profile|
+      config.select {|k,v| !%w(default).include?(k) }.each do |profile|
         _profile = AccountAttributes.new(profile[1])
         _profile.name = profile[0]
         @account << _profile
       end
     end
+
   end
 
   class AccountAttributes < OpenStruct
@@ -38,6 +38,7 @@ module Popper
     def to_h
       @hash_table
     end
+
   end
 
   def self.load_config(options)
