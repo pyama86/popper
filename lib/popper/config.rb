@@ -11,10 +11,10 @@ module Popper
       @default = AccountAttributes.new(config["default"]) if config["default"]
       @accounts = []
 
-      config.select {|k,v| !%w(default).include?(k) }.each do |profile|
-        _profile = AccountAttributes.new(profile[1])
-        _profile.name = profile[0]
-        @accounts << _profile
+      config.select {|k,v| !%w(default).include?(k) }.each do |account|
+        _account = AccountAttributes.new(account[1])
+        _account.name = account[0]
+        @accounts << _account
       end
     end
 

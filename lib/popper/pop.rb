@@ -5,9 +5,9 @@ module Popper
     def self.run
       begin
         Popper::Sync.synchronized do
-          Popper.configure.accounts.each do |profile|
-            uidls = pop(profile)
-            last_uidl(profile.name, uidls)
+          Popper.configure.accounts.each do |account|
+            uidls = pop(account)
+            last_uidl(account.name, uidls)
           end
         end
       rescue Locked
@@ -15,30 +15,30 @@ module Popper
       end
     end
 
-    def self.pop(profile)
+    def self.pop(account)
       uidls = []
-      Popper.log.info "start popper #{profile.name}"
+      Popper.log.info "start popper #{account.name}"
 
-      connection(profile) do |pop|
-        pop.mails.reject {|m| last_uidl(profile.name).include?(m.uidl) }.each do |m|
+      connection(account) do |pop|
+        pop.mails.reject {|m| last_uidl(account.name).include?(m.uidl) }.each do |m|
           mail = Mail.new(m.mail)
-          if rule = match_rule?(profile, mail)
+          if rule = match_rule?(account, mail)
             Popper.log.info "match mail #{mail.subject}"
-            Popper::Action::Git.run(profile.action_by_rule(rule), mail) if profile.action_by_rule(rule)
+            Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
           end
           uidls << m.uidl
         end
-        Popper.log.info "success popper #{profile.name}"
+        Popper.log.info "success popper #{account.name}"
       end
       uidls
     end
 
-    def self.connection(profile, &block)
+    def self.connection(account, &block)
       Net::POP3.start(
-        profile.login.server,
-        profile.login.port || 110,
-        profile.login.user,
-        profile.login.password
+        account.login.server,
+        account.login.port || 110,
+        account.login.user,
+        account.login.password
       ) do |pop|
         block.call(pop)
       end
@@ -46,11 +46,11 @@ module Popper
         Popper.log.warn e
     end
 
-    def self.match_rule?(profile, mail)
-      profile.rules.to_h.keys.find do |rule|
+    def self.match_rule?(account, mail)
+      account.rules.to_h.keys.find do |rule|
         # merge default rule
         rule_hash = Popper.configure.default.respond_to?(:condition) ? Popper.configure.default.condition.to_h : {}
-        rule_hash.deep_merge(profile.condition_by_rule(rule).to_h).all? do |header,conditions|
+        rule_hash.deep_merge(account.condition_by_rule(rule).to_h).all? do |header,conditions|
           conditions.all? do |condition|
             mail.respond_to?(header) && mail.send(header).to_s.match(/#{condition}/)
           end
@@ -69,15 +69,15 @@ module Popper
     end
 
     def self.prepop
-      Popper.configure.accounts.each do |profile|
-        puts "start prepop #{profile.name}"
-        connection(profile) do |pop|
+      Popper.configure.accounts.each do |account|
+        puts "start prepop #{account.name}"
+        connection(account) do |pop|
           uidls = pop.mails.map(&:uidl)
           last_uidl(
-            profile.name,
+            account.name,
             uidls
           )
-          puts "success prepop #{profile.name} mail count:#{uidls.count}"
+          puts "success prepop #{account.name} mail count:#{uidls.count}"
         end
       end
     end
