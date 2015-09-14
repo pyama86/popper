@@ -20,11 +20,12 @@ module Popper
     end
 
     def self.pop(account)
-      current_uidls = []
       error_uidls = []
       Popper.log.info "start popper #{account.name}"
       connection(account) do |pop|
-        pop.mails.reject {|m| current_uidls << m.uidl; last_uidl(account.name).include?(m.uidl) }.each do |m|
+        current_uidls = pop.mails.map(&:uidl)
+        target_uidls = current_uidls - last_uidl(account.name)
+        pop.mails.select {|_m|target_uidls.include?(_m.uidl) }.each do |m|
           begin
             mail = EncodeMail.new(m.mail)
             Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
@@ -51,7 +52,9 @@ module Popper
         account.login.user,
         account.login.password
       ) do |pop|
+        Popper.log.info "connect server #{account.name}"
         block.call(pop)
+        Popper.log.info "disconnect server #{account.name}"
       end
     end
 
@@ -78,17 +81,17 @@ module Popper
     def self.prepop
       Popper.configure.accounts.each do |account|
         Popper.log.info "start prepop #{account.name}"
-        connection(account) do |pop|
-          begin
-            uidls = pop.mails.map(&:uidl)
-            last_uidl(
-              account.name,
-              uidls
-            )
-            Popper.log.info "success prepop #{account.name} mail count:#{uidls.count}"
-          rescue => e
-            Popper.log.warn  e
+        begin
+          connection(account) do |pop|
+              uidls = pop.mails.map(&:uidl)
+              last_uidl(
+                account.name,
+                uidls
+              )
+              Popper.log.info "success prepop #{account.name} mail count:#{uidls.count}"
           end
+        rescue => e
+          Popper.log.warn  e
         end
       end
     end
