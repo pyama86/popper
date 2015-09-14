@@ -60,8 +60,8 @@ module Popper
 
       define_method("#{name}_by_rule") do |rule|
         hash = self.send("global_default_#{name}")
-        hash.deep_merge!(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
-        hash.deep_merge!(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
+        hash = hash.deep_merge(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
+        hash = hash.deep_merge(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
         AccountAttributes.new(hash)
       end
     end

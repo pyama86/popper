@@ -6,7 +6,7 @@ module Popper::Action
       url = octkit.create_issue(
         my_config.repo,
         mail.subject,
-        mail.body.decoded.encode("UTF-8", mail.charset)
+        mail.body
       )
       params["#{self.action}_url".to_sym] = url[:html_url] if url
       params

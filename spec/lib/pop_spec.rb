@@ -13,7 +13,7 @@ describe Popper::Pop do
 
   describe 'run' do
     before do
-      allow(Net::POP3).to receive(:start).and_yield(dummy_pop)
+      allow_any_instance_of(Net::POP3).to receive(:start).and_yield(dummy_pop)
       expect_any_instance_of(Slack::Notifier).to receive(:ping).with(
         "test message @test git:https://test.git.com/v3/issues/#123 ghe:https://test.ghe.com/v3/issues/#123",
         {
@@ -80,28 +80,28 @@ Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network)
 end
 
 def ok_mail
-  mail = Mail.new
+  mail = EncodeMail.new
   mail.subject = "test example subject"
   mail.body    = "test example word account default body"
   mail
 end
 
 def ng_body_mail
-  mail = Mail.new
+  mail = EncodeMail.new
   mail.subject = "test example subject"
   mail.body    = "test nomatch word"
   mail
 end
 
 def ng_mail
-  mail = Mail.new
+  mail = EncodeMail.new
   mail.subject = "test nomatch subject"
   mail.body    = "test nomatch word"
   mail
 end
 
 def reply_mail
-  mail = Mail.new
+  mail = EncodeMail.new
   mail.subject = "Re: test example subject"
   mail.body    = "test example word"
   mail

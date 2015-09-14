@@ -1,5 +1,6 @@
 require 'net/pop'
 require 'mail'
+require 'kconv'
 module Popper
   class Pop
     def self.run
@@ -21,12 +22,17 @@ module Popper
 
       connection(account) do |pop|
         pop.mails.reject {|m| last_uidl(account.name).include?(m.uidl) }.each do |m|
-          mail = Mail.new(m.mail)
-          if rule = matching?(account, mail)
-            Popper.log.info "match mail #{mail.subject}"
-            Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
+          begin
+            mail = EncodeMail.new(m.mail)
+            Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
+            if rule = matching?(account, mail)
+              Popper.log.info "do action:#{mail.subject}"
+              Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
+            end
+            uidls << m.uidl
+          rescue Net::POPError => e
+            Popper.log.warn e
           end
-          uidls << m.uidl
         end
         Popper.log.info "success popper #{account.name}"
       end
@@ -34,9 +40,10 @@ module Popper
     end
 
     def self.connection(account, &block)
-      Net::POP3.start(
-        account.login.server,
-        account.login.port || 110,
+      pop = Net::POP3.new(account.login.server, account.login.port || 110)
+      pop.open_timeout = ENV['POP_TIMEOUT'] || 120
+      pop.read_timeout = ENV['POP_TIMEOUT'] || 120
+      pop.start(
         account.login.user,
         account.login.password
       ) do |pop|
@@ -90,5 +97,15 @@ class ::Hash
 
   def deep_merge!(second)
     self.merge!(deep_merge(second))
+  end
+end
+
+class EncodeMail < Mail::Message
+  def subject
+    Kconv.toutf8(self[:Subject].value) if self[:Subject]
+  end
+
+  def body
+    super.decoded.encode("UTF-8", self.charset)
   end
 end
