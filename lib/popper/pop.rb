@@ -7,7 +7,11 @@ module Popper
       begin
         Popper::Sync.synchronized do
           Popper.configure.accounts.each do |account|
-            pop(account)
+            begin
+              pop(account)
+            rescue => e
+              Popper.log warn e
+            end
           end
         end
       rescue Locked
@@ -49,8 +53,6 @@ module Popper
       ) do |pop|
         block.call(pop)
       end
-      rescue => e
-        Popper.log.warn e
     end
 
     def self.matching?(account, mail)
