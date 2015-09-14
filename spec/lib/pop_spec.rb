@@ -30,7 +30,7 @@ describe Popper::Pop do
       allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "test/example",
         "test example subject",
-        "test example body\n",
+        "test example body account default body\n",
       ).and_return(
         { html_url: "https://test.git.com/v3/issues/#123" }
       )
@@ -38,7 +38,7 @@ describe Popper::Pop do
       allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "example/default",
         "test example subject",
-        "test example body\n",
+        "test example body account default body\n",
       ).and_return(
         { html_url: "https://test.ghe.com/v3/issues/#123" }
       )
@@ -47,11 +47,11 @@ describe Popper::Pop do
     it { expect(described_class.run).to be_truthy }
   end
 
-  describe 'match_rule?' do
-    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ok_mail)).to be_truthy }
-    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ng_body_mail)).to be_falsey }
-    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ng_mail)).to be_falsey }
-    it { expect(described_class.match_rule?(Popper.configure.accounts.first, reply_mail)).to be_falsey }
+  describe 'matching?' do
+    it { expect(described_class.matching?(Popper.configure.accounts.first, ok_mail)).to be_truthy }
+    it { expect(described_class.matching?(Popper.configure.accounts.first, ng_body_mail)).to be_falsey }
+    it { expect(described_class.matching?(Popper.configure.accounts.first, ng_mail)).to be_falsey }
+    it { expect(described_class.matching?(Popper.configure.accounts.first, reply_mail)).to be_falsey }
   end
 end
 
@@ -69,7 +69,7 @@ def dummy_pop
 
     def pop_mail.mail
       <<-EOS
-Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network); 10 Sep 2015 16:20:10 +0900\r\nTo: example@example.com\r\nSubject: test example subject\r\nFrom:no-reply@example.com\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=ISO-2022-JP\r\nContent-Transfer-Encoding: 7bit\r\nMessage-Id: <20150910072010.0545296845A@example.com>\r\nDate: Thu, 10 Sep 2015 16:20:10 +0900 (JST)\r\n\r\ntest example body
+Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network); 10 Sep 2015 16:20:10 +0900\r\nTo: example@example.com\r\nSubject: test example subject\r\nFrom:no-reply@example.com\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=ISO-2022-JP\r\nContent-Transfer-Encoding: 7bit\r\nMessage-Id: <20150910072010.0545296845A@example.com>\r\nDate: Thu, 10 Sep 2015 16:20:10 +0900 (JST)\r\n\r\ntest example body account default body
       EOS
     end
     [
@@ -82,7 +82,7 @@ end
 def ok_mail
   mail = Mail.new
   mail.subject = "test example subject"
-  mail.body    = "test example word"
+  mail.body    = "test example word account default body"
   mail
 end
 

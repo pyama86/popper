@@ -48,9 +48,7 @@ module Popper
 
     def self.matching?(account, mail)
       account.rules.to_h.keys.find do |rule|
-        # merge default rule
-        rule_hash = Popper.configure.default.respond_to?(:condition) ? Popper.configure.default.condition.to_h : {}
-        rule_hash.deep_merge(account.condition_by_rule(rule).to_h).all? do |header,conditions|
+        account.condition_by_rule(rule).to_h.all? do |header,conditions|
           conditions.all? do |condition|
             mail.respond_to?(header) && mail.send(header).to_s.match(/#{condition}/)
           end

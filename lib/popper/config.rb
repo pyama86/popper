@@ -38,13 +38,35 @@ module Popper
       @hash_table
     end
 
-    def action_by_rule(rule)
-      self.rules.send(rule).action if rules.send(rule).respond_to?(:action)
+    %w(
+      condition
+      action
+    ).each do |name|
+      define_method("global_default_#{name}") {
+        begin
+          Popper.configure.default.send(name).to_h
+        rescue
+          {}
+        end
+      }
+
+      define_method("account_default_#{name}") {
+        begin
+          self.default.send(name).to_h
+        rescue
+          {}
+        end
+      }
+
+      define_method("#{name}_by_rule") do |rule|
+        hash = self.send("global_default_#{name}")
+        hash.deep_merge!(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
+        hash.deep_merge!(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
+        AccountAttributes.new(hash)
+      end
     end
 
-    def condition_by_rule(rule)
-      self.rules.send(rule).condition if rules.send(rule).respond_to?(:condition)
-    end
+
   end
 
   def self.load_config(options)

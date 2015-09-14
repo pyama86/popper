@@ -38,19 +38,7 @@ module Popper::Action
     end
 
     def self.set_config(config)
-      action_hash = case
-      when Popper.configure.default.respond_to?(:action) && Popper.configure.default.action.respond_to?(self.action)
-        Popper.configure.default.action.send(self.action).to_h
-      else
-        {}
-      end
-
-      action_hash.deep_merge!(
-        config.send(self.action.to_s).to_h
-      ) if config.respond_to?(self.action)
-
-      @_config = OpenStruct.new(action_hash) 
-      @_config
+      @_config = config.send(self.action) if config.respond_to?(self.action)
     end
 
     def self.my_config
