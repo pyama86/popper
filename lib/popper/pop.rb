@@ -17,11 +17,12 @@ module Popper
     end
 
     def self.pop(account)
-      uidls = []
+      error_uidl = []
       Popper.log.info "start popper #{account.name}"
-
       connection(account) do |pop|
-        pop.mails.reject {|m| last_uidl(account.name).include?(m.uidl) }.each do |m|
+        current_uidls = []
+
+        pop.mails.reject {|m| current_uidls << m.uidl; last_uidl(account.name).include?(m.uidl) }.each do |m|
           begin
             mail = EncodeMail.new(m.mail)
             Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
@@ -29,14 +30,14 @@ module Popper
               Popper.log.info "do action:#{mail.subject}"
               Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
             end
-            uidls << m.uidl
-          rescue Net::POPError => e
+          rescue => e
+            error_uidl << m.uidl
             Popper.log.warn e
           end
         end
         Popper.log.info "success popper #{account.name}"
       end
-      uidls
+      current_uidls - error_uidls
     end
 
     def self.connection(account, &block)
