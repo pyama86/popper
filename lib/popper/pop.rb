@@ -18,7 +18,7 @@ module Popper
 
     def self.pop(account)
       current_uidls = []
-      error_uidl = []
+      error_uidls = []
       Popper.log.info "start popper #{account.name}"
       connection(account) do |pop|
 
@@ -31,7 +31,7 @@ module Popper
               Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
             end
           rescue => e
-            error_uidl << m.uidl
+            error_uidls << m.uidl
             Popper.log.warn e
           end
         end
