@@ -11,7 +11,6 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{email notification tool}
   spec.description   = %q{email notification tool}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
   spec.homepage      = "http://ten-snapon.com"
   spec.license       = "MIT"
 
