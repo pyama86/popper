@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/pyama86/popper.svg)](https://travis-ci.org/pyama86/popper)
 [![Code Climate](https://codeclimate.com/github/pyama86/popper/badges/gpa.svg)](https://codeclimate.com/github/pyama86/popper)
+[![Code Climate](https://codeclimate.com/github/pyama86/popper/badges/gpa.svg)](https://codeclimate.com/github/pyama86/popper)
 
 To post a variety of services by analyzing the email
 * slack notification
@@ -50,6 +51,14 @@ server = "example.com"
 user = "example@example.com"
 password = "password"
 port = 110(default)
+
+# [config_name].default.condition
+[example.default.condition]
+subject = [".*default.*"]
+
+# [config_name].default.action.[action_name]
+[example.default.action.slack]
+channel = "#account default"
 
 # [config_name].rules.[rule_name].condition
 [example.rules.normal_log.condition]
