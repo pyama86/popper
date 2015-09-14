@@ -8,7 +8,7 @@ module Popper
         Popper::Sync.synchronized do
           Popper.configure.accounts.each do |account|
             uidls = pop(account)
-            last_uidl(account.name, uidls)
+            last_uidl(account.name, uidls) if uidls.length > 0
           end
         end
       rescue Locked
