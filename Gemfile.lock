@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    popper (0.1.0)
+    popper (0.1.1)
       mail
       octokit
       slack-notifier
