@@ -77,12 +77,16 @@ module Popper
       Popper.configure.accounts.each do |account|
         puts "start prepop #{account.name}"
         connection(account) do |pop|
-          uidls = pop.mails.map(&:uidl)
-          last_uidl(
-            account.name,
-            uidls
-          )
-          puts "success prepop #{account.name} mail count:#{uidls.count}"
+          begin
+            uidls = pop.mails.map(&:uidl)
+            last_uidl(
+              account.name,
+              uidls
+            )
+            puts "success prepop #{account.name} mail count:#{uidls.count}"
+          rescue => e
+            puts e
+          end
         end
       end
     end

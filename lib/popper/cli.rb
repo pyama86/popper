@@ -19,6 +19,7 @@ module Popper
     desc "prepop", "get current mailbox all uidl"
     def prepop
       Popper.load_config(options)
+      Popper.init_logger(options)
       Popper::Pop.prepop
     end
 
