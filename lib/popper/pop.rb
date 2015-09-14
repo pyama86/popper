@@ -21,7 +21,6 @@ module Popper
       error_uidls = []
       Popper.log.info "start popper #{account.name}"
       connection(account) do |pop|
-
         pop.mails.reject {|m| current_uidls << m.uidl; last_uidl(account.name).include?(m.uidl) }.each do |m|
           begin
             mail = EncodeMail.new(m.mail)
