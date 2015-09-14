@@ -5,7 +5,7 @@ module Popper
     def self.run
       begin
         Popper::Sync.synchronized do
-          Popper.configure.account.each do |profile|
+          Popper.configure.accounts.each do |profile|
             uidls = pop(profile)
             last_uidl(profile.name, uidls)
           end
@@ -69,7 +69,7 @@ module Popper
     end
 
     def self.prepop
-      Popper.configure.account.each do |profile|
+      Popper.configure.accounts.each do |profile|
         puts "start prepop #{profile.name}"
         connection(profile) do |pop|
           uidls = pop.mails.map(&:uidl)

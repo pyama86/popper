@@ -3,18 +3,18 @@ require 'ostruct'
 require 'logger'
 module Popper
   class Config
-    attr_reader :default, :account
+    attr_reader :default, :accounts
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
 
       config = TOML.load_file(config_path)
       @default = AccountAttributes.new(config["default"]) if config["default"]
-      @account = []
+      @accounts = []
 
       config.select {|k,v| !%w(default).include?(k) }.each do |profile|
         _profile = AccountAttributes.new(profile[1])
         _profile.name = profile[0]
-        @account << _profile
+        @accounts << _profile
       end
     end
 

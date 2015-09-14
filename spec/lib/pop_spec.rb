@@ -48,10 +48,10 @@ describe Popper::Pop do
   end
 
   describe 'match_rule?' do
-    it { expect(described_class.match_rule?(Popper.configure.account.first, ok_mail)).to be_truthy }
-    it { expect(described_class.match_rule?(Popper.configure.account.first, ng_body_mail)).to be_falsey }
-    it { expect(described_class.match_rule?(Popper.configure.account.first, ng_mail)).to be_falsey }
-    it { expect(described_class.match_rule?(Popper.configure.account.first, reply_mail)).to be_falsey }
+    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ok_mail)).to be_truthy }
+    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ng_body_mail)).to be_falsey }
+    it { expect(described_class.match_rule?(Popper.configure.accounts.first, ng_mail)).to be_falsey }
+    it { expect(described_class.match_rule?(Popper.configure.accounts.first, reply_mail)).to be_falsey }
   end
 end
 
