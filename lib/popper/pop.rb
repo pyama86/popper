@@ -7,8 +7,7 @@ module Popper
       begin
         Popper::Sync.synchronized do
           Popper.configure.accounts.each do |account|
-            uidls = pop(account)
-            last_uidl(account.name, uidls) if uidls.length > 0
+            pop(account)
           end
         end
       rescue Locked
@@ -34,9 +33,10 @@ module Popper
             Popper.log.warn e
           end
         end
+        # write cache
+        last_uidl(account.name, current_uidls - error_uidls)
         Popper.log.info "success popper #{account.name}"
       end
-      current_uidls - error_uidls
     end
 
     def self.connection(account, &block)
