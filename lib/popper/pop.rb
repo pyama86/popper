@@ -83,12 +83,12 @@ module Popper
         Popper.log.info "start prepop #{account.name}"
         begin
           connection(account) do |pop|
-              uidls = pop.mails.map(&:uidl)
-              last_uidl(
-                account.name,
-                uidls
-              )
-              Popper.log.info "success prepop #{account.name} mail count:#{uidls.count}"
+            uidls = pop.mails.map(&:uidl)
+            last_uidl(
+              account.name,
+              uidls
+            )
+            Popper.log.info "success prepop #{account.name} mail count:#{uidls.count}"
           end
         rescue => e
           Popper.log.warn  e
