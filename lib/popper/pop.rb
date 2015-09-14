@@ -22,7 +22,7 @@ module Popper
       connection(account) do |pop|
         pop.mails.reject {|m| last_uidl(account.name).include?(m.uidl) }.each do |m|
           mail = Mail.new(m.mail)
-          if rule = match_rule?(account, mail)
+          if rule = matching?(account, mail)
             Popper.log.info "match mail #{mail.subject}"
             Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
           end
@@ -46,7 +46,7 @@ module Popper
         Popper.log.warn e
     end
 
-    def self.match_rule?(account, mail)
+    def self.matching?(account, mail)
       account.rules.to_h.keys.find do |rule|
         # merge default rule
         rule_hash = Popper.configure.default.respond_to?(:condition) ? Popper.configure.default.condition.to_h : {}
