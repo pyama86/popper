@@ -13,18 +13,6 @@ module Popper
 
     def self.sample_config
       <<-EOS
-[popper]
-slack_webhook_url = "https://test.slack.com"
-slack_user = "popper"
-git_token = "test"
-ghe_token = "test"
-ghe_url = "http://ghe.example.com"
-
-[example.login]
-server = "mail.examplejp"
-user = "examplle_user"
-password = "examplle_pass"
-
 [default.condition]
 subject = ["^(?!.*Re:).+$"]
 
@@ -33,6 +21,11 @@ webhook_url = "webhook_url"
 user = "slack"
 channel = "#default_channel"
 message = "default message"
+
+[example.login]
+server = "mail.examplejp"
+user = "examplle_user"
+password = "examplle_pass"
 
 [example.default.condition]
 subject = [".*default.*"]
