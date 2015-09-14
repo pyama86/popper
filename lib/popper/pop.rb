@@ -17,10 +17,10 @@ module Popper
     end
 
     def self.pop(account)
+      current_uidls = []
       error_uidl = []
       Popper.log.info "start popper #{account.name}"
       connection(account) do |pop|
-        current_uidls = []
 
         pop.mails.reject {|m| current_uidls << m.uidl; last_uidl(account.name).include?(m.uidl) }.each do |m|
           begin
@@ -76,7 +76,7 @@ module Popper
 
     def self.prepop
       Popper.configure.accounts.each do |account|
-        puts "start prepop #{account.name}"
+        Popper.log.info "start prepop #{account.name}"
         connection(account) do |pop|
           begin
             uidls = pop.mails.map(&:uidl)
@@ -84,9 +84,9 @@ module Popper
               account.name,
               uidls
             )
-            puts "success prepop #{account.name} mail count:#{uidls.count}"
+            Popper.log.info "success prepop #{account.name} mail count:#{uidls.count}"
           rescue => e
-            puts e
+            Popper.log.warn  e
           end
         end
       end
