@@ -10,7 +10,7 @@ module Popper
             begin
               pop(account)
             rescue => e
-              Popper.log warn e
+              Popper.log.warn e
             end
           end
         end
