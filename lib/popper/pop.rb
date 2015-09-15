@@ -24,17 +24,22 @@ module Popper
       error_uidls = []
       Popper.log.info "start popper #{account.name}"
       connection(account) do |pop|
+
         current_uidls = pop.mails.map(&:uidl)
         target_uidls = current_uidls - last_uidl(account.name)
+
         pop.mails.select {|_m|target_uidls.include?(_m.uidl) }.each do |m|
           begin
             mail = EncodeMail.new(m.mail)
             Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
+
             if rule = matching?(account, mail)
               Popper.log.info "do action:#{mail.subject}"
               Popper::Action::Git.run(account.action_by_rule(rule), mail) if account.action_by_rule(rule)
             end
+
             done_uidls << m.uidl
+
           rescue Net::POPError => e
             last_uidl(account.name, last_uidl(account.name) + done_uidls)
             raise e
