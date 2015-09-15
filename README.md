@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/pyama86/popper.svg)](https://travis-ci.org/pyama86/popper)
 [![Code Climate](https://codeclimate.com/github/pyama86/popper/badges/gpa.svg)](https://codeclimate.com/github/pyama86/popper)
-[![Code Climate](https://codeclimate.com/github/pyama86/popper/badges/gpa.svg)](https://codeclimate.com/github/pyama86/popper)
+[![Test Coverage](https://codeclimate.com/github/pyama86/popper/badges/coverage.svg)](https://codeclimate.com/github/pyama86/popper/coverage)
 
 To post a variety of services by analyzing the email
 * slack notification
