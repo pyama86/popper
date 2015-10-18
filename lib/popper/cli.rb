@@ -5,11 +5,21 @@ module Popper
   class CLI < Thor
     class_option :config, type: :string, aliases: '-c'
     class_option :log, type: :string, aliases: '-l'
+    class_option :daemon, type: :boolean, aliases: '-d'
     default_task :pop
     desc "pop", "from pop3"
     def pop
       Popper.init_logger(options)
       Popper.load_config(options)
+
+      if(options[:daemon])
+        prepop
+        Process.daemon
+        while true
+          sleep(60 || Popper.configure.global.interval)
+          Popper::Pop.run
+        end
+      end
       Popper::Pop.run
       rescue => e
         Popper.log.fatal(e)
