@@ -8,8 +8,8 @@ module Popper
     default_task :pop
     desc "pop", "from pop3"
     def pop
-      Popper.load_config(options)
       Popper.init_logger(options)
+      Popper.load_config(options)
       Popper::Pop.run
       rescue => e
         Popper.log.fatal(e)
@@ -18,8 +18,8 @@ module Popper
 
     desc "prepop", "get current mailbox all uidl"
     def prepop
-      Popper.load_config(options)
       Popper.init_logger(options, true)
+      Popper.load_config(options)
       Popper::Pop.prepop
     end
 

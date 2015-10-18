@@ -12,6 +12,8 @@ module Popper
     log_path = options[:log] || File.join(Dir.home, "popper", "popper.log")
     log_path = STDOUT if ENV["POPPER_TEST"] || stdout
     @_logger = Logger.new(log_path)
+  rescue => e
+    puts e
   end
 
   def self.log
