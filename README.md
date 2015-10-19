@@ -13,22 +13,15 @@ To post a variety of services by analyzing the email
 
 # usage
 ```
-  # create ~/popper/popper.conf
+  # create /etc/popper.conf
   $ popper init
 
   # edit popper.conf
-  $ vi ~/popper/popper.conf
+  $ vi /etc/popper.conf
 
-  # pop uidl prefetch
-  # to avoid duplication and to fetch the uidl
-  $ popper prepop
-
-  $ popper
+  $ popper --daemon --config /etc/popper.conf --log /var/log/popper.log --pidfile /var/run/popper/popper.pid
 ```
-`crontab -l`
-```
-* * * * * /path/to/popper
-```
+systmd service config: https://github.com/pyama86/popper/tree/master/init_script/cent7/etc/systemd/system/popper.service
 
 # configure(toml)
 ## ~/popper/popper.conf
@@ -86,8 +79,12 @@ user = "example2@example.com"
 ```
 
 # option
-* config_file `--config or -c`
-* log_file(default=/var/log/popper.log) `--log or -l`
+```
+  -c, [--config=CONFIG]
+  -l, [--log=LOG]
+  -d, [--daemon], [--no-daemon]
+  -p, [--pidfile=PIDFILE]
+```
 
 # author
 * pyama
