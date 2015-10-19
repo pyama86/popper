@@ -12,7 +12,11 @@ module Popper
     end
 
     def self.lockfile
-      work_dir = Popper.configure.global.work_dir || "/var/tmp"
+      work_dir = if Popper.configure.global.respond_to?(:work_dir)
+               Popper.configure.global.work_dir
+             else
+               "/var/tmp"
+             end
       File.join(work_dir, "popper.lock")
     end
   end
