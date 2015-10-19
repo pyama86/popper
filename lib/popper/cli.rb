@@ -15,7 +15,7 @@ module Popper
 
       if(options[:daemon])
         Process.daemon
-        open(options[:pidfile] || File.join(Dir.home, "popper", "popper.pid") , 'w') {|f| f << Process.pid}
+        open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
 
         Popper::Pop.prepop
 

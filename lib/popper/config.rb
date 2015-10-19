@@ -71,7 +71,7 @@ module Popper
   end
 
   def self.load_config(options)
-    config_path = options[:config] || File.join(Dir.home, "popper", "popper.conf")
+    config_path = options[:config] || "/etc/popper.conf"
     @_config = Config.new(config_path)
   end
 
