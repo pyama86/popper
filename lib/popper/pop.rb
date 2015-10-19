@@ -79,7 +79,7 @@ module Popper
     end
 
     def self.last_uidl(account, uidl=nil)
-      path = File.join(Dir.home, "popper", ".#{account}.uidl")
+      path = Popper.configure.global.work_dir || "/var/tmp"
       @_uidl ||= {}
 
       File.write(File.join(path), uidl.join("\n")) if uidl

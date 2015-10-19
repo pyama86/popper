@@ -12,7 +12,8 @@ module Popper
     end
 
     def self.lockfile
-      File.join(Dir.home, "popper", "popper.lock")
+      work_dir = Popper.configure.global.work_dir || "/var/tmp"
+      File.join(work_dir, "popper.lock")
     end
   end
 end
