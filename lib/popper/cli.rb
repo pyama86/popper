@@ -13,8 +13,8 @@ module Popper
       Popper.load_config(options)
 
       if(options[:daemon])
-        prepop
         Process.daemon
+        Popper::Pop.prepop
         while true
           sleep(60 || Popper.configure.global.interval)
           Popper::Pop.run
