@@ -15,7 +15,7 @@ module Popper
           end
         end
       rescue Locked
-        puts "There will be a running process"
+        Popper.log.warn "There will be a running process. lock file exists:#{Popper::Synk.lockfile}"
       end
     end
 
