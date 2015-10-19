@@ -102,6 +102,7 @@ module Popper
           end
         rescue => e
           Popper.log.warn  e
+          raise "prepop failue account:#{account.name}"
         end
       end
     end
