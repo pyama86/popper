@@ -23,8 +23,9 @@ module Popper
           sleep(60 || Popper.configure.global.interval)
           Popper::Pop.run
         end
+      else
+        Popper::Pop.run
       end
-      Popper::Pop.run
       rescue => e
         Popper.log.fatal(e)
         Popper.log.fatal(e.backtrace)
