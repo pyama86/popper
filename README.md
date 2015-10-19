@@ -27,8 +27,8 @@ systmd service config: https://github.com/pyama86/popper/tree/master/init_script
 ## ~/popper/popper.conf
 ```
 [global]
-interval = 60       # fetch interbal default:60
-work_dir = /var/tmp # working directory
+interval = 60         # fetch interbal default:60
+work_dir = "/var/tmp" # working directory
 
 [default.condition]
 
