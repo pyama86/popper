@@ -6,7 +6,7 @@ module Popper
     class_option :config, type: :string, aliases: '-c'
     class_option :log, type: :string, aliases: '-l'
     class_option :daemon, type: :boolean, aliases: '-d'
-    class_option :pidfile, type: :string, aliases: '-p', default: '/var/run/popper.pid'
+    class_option :pidfile, type: :string, aliases: '-p'
     default_task :pop
     desc "pop", "from pop3"
     def pop
@@ -15,8 +15,10 @@ module Popper
 
       if(options[:daemon])
         Process.daemon
-        open(options[:pid_file], 'w') {|f| f << Process.pid}
+        open(options[:pidfile] || File.join(Dir.home, "popper", "popper.pid") , 'w') {|f| f << Process.pid}
+
         Popper::Pop.prepop
+
         while true
           sleep(60 || Popper.configure.global.interval)
           Popper::Pop.run
