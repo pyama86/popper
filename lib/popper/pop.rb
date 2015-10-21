@@ -81,12 +81,14 @@ module Popper
 
     def self.last_uidl(account, uidl=nil)
       path = File.join(Popper.work_dir, ".#{account}.uidl")
-
       @_uidl ||= {}
 
-      File.write(File.join(path), uidl.join("\n")) if uidl
-
-      @_uidl[account] ||= File.exist?(path) ? File.read(path).split(/\r?\n/) : []
+      if uidl
+        File.write(File.join(path), uidl.join("\n"))
+        @_uidl[account] = uidl
+      else
+        @_uidl[account] ||= File.exist?(path) ? File.read(path).split(/\r?\n/) : []
+      end
       @_uidl[account]
     end
 
