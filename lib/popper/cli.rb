@@ -31,13 +31,6 @@ module Popper
         Popper.log.fatal(e.backtrace)
     end
 
-    desc "prepop", "get current mailbox all uidl"
-    def prepop
-      Popper.init_logger(options, true)
-      Popper.load_config(options)
-      Popper::Pop.prepop
-    end
-
     desc "init", "create home dir"
     def init
       Popper::Init.run(options)
