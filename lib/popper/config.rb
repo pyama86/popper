@@ -78,4 +78,12 @@ module Popper
   def self.configure
     @_config
   end
+
+  def self.work_dir
+    if configure.global.respond_to?(:work_dir)
+      configure.global.work_dir
+    else
+      "/var/tmp"
+    end
+  end
 end

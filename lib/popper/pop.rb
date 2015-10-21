@@ -42,6 +42,7 @@ module Popper
 
           rescue Net::POPError => e
             last_uidl(account.name, last_uidl(account.name) + done_uidls)
+            Popper.log.warn "pop err write uidl"
             raise e
           rescue => e
             error_uidls << m.uidl
@@ -79,12 +80,7 @@ module Popper
     end
 
     def self.last_uidl(account, uidl=nil)
-      work_dir = if Popper.configure.global.respond_to?(:work_dir)
-               Popper.configure.global.work_dir
-             else
-               "/var/tmp"
-             end
-      path = File.join(work_dir, ".#{account}.uidl")
+      path = File.join(Popper.work_dir, ".#{account}.uidl")
 
       @_uidl ||= {}
 
