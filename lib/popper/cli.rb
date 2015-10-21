@@ -14,10 +14,10 @@ module Popper
       Popper.load_config(options)
 
       if(options[:daemon])
+        Popper::Pop.prepop
+
         Process.daemon
         open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
-
-        Popper::Pop.prepop
 
         while true
           sleep(60 || Popper.configure.global.interval)
