@@ -15,7 +15,7 @@ module Popper
 
       if(options[:daemon])
         Process.daemon
-        open(options[:pidfile] || File.join(Dir.home, "popper", "popper.pid") , 'w') {|f| f << Process.pid}
+        open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
 
         Popper::Pop.prepop
 
@@ -23,8 +23,9 @@ module Popper
           sleep(60 || Popper.configure.global.interval)
           Popper::Pop.run
         end
+      else
+        Popper::Pop.run
       end
-      Popper::Pop.run
       rescue => e
         Popper.log.fatal(e)
         Popper.log.fatal(e.backtrace)
