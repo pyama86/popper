@@ -9,14 +9,14 @@ module Popper::Action
       if action?
         begin
           Popper.log.info "run action #{self.action}"
-          params = task(config, mail, params)
+          next_params = task(config, mail, params)
           Popper.log.info "exit action #{self.action}"
         rescue => e
           Popper.log.warn e
           Popper.log.warn e.backtrace
         end
       end
-      next_run(config, mail, params)
+      next_run(config, mail, next_params)
     end
 
     def self.next_action(action=nil)
@@ -34,14 +34,14 @@ module Popper::Action
     end
 
     def self.action?
-      my_config && check_params
+      config && check_params
     end
 
     def self.set_config(config)
       @_config = config.send(self.action) if config.respond_to?(self.action)
     end
 
-    def self.my_config
+    def self.config
       @_config
     end
 
