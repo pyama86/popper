@@ -14,7 +14,6 @@ module Popper
       <<-EOS
 [global]
 interval = 60         # fetch interbal default:60
-work_dir = "/var/tmp" # working directory
 
 [default.condition]
 subject = ["^(?!.*Re:).+$"]

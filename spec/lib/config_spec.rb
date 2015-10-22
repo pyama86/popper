@@ -10,7 +10,6 @@ describe Popper::Config do
 
   context 'global' do
     it { expect(Popper.configure.global.interval).to eq 60 }
-    it { expect(Popper.configure.global.work_dir).to eq "/var/tmp" }
   end
 
   context 'condition' do

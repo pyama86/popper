@@ -14,18 +14,17 @@ module Popper
       Popper.load_config(options)
 
       if(options[:daemon])
-        Popper::Pop.prepop
-
         Process.daemon
         open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
-
-        while true
-          sleep(60 || Popper.configure.global.interval)
-          Popper::Pop.run
-        end
-      else
-        Popper::Pop.run
       end
+
+      accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
+
+      while true
+        sleep(60 || Popper.configure.global.interval)
+        accounts.each(&:run)
+      end
+
       rescue => e
         Popper.log.fatal(e)
         Popper.log.fatal(e.backtrace)
