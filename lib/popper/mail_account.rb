@@ -10,7 +10,8 @@ module Popper
 
     def run
       session_start do |conn|
-        @complete_uidl_list = _current_uidl_list(conn) unless @complete_uidl_list
+        @current_uidl_list = conn.mails.map(&:uidl)
+        @complete_uidl_list = @current_uidl_list unless @complete_uidl_list
         pop(conn)
       end
     end
@@ -21,9 +22,7 @@ module Popper
 
       Popper.log.info "start popper #{@config.name}"
 
-      current_uidl_list = _current_uidl_list(conn)
-      process_uidl_list = current_uidl_list - @complete_uidl_list
-      conn.mails.select {|_m|process_uidl_list.include?(_m.uidl) }.each do |m|
+      process_uidl_list(conn).each do |m|
         begin
           mail = EncodeMail.new(m.mail)
           Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
@@ -44,7 +43,7 @@ module Popper
         end
       end
 
-      @complete_uidl_list = current_uidl_list - error_uidls
+      @complete_uidl_list = @current_uidl_list - error_uidls
       Popper.log.info "success popper #{@config.name}"
     end
 
@@ -62,6 +61,11 @@ module Popper
       end
     end
 
+    def process_uidl_list(conn)
+      uidl_list = @current_uidl_list - @complete_uidl_list
+      conn.mails.select {|_m|uidl_list.include?(_m.uidl)}
+    end
+
     def match_rule?(mail)
       @config.rules.to_h.keys.find do |rule|
         @config.condition_by_rule(rule).to_h.all? do |mail_header,conditions|
@@ -70,10 +74,6 @@ module Popper
           end
         end
       end
-    end
-
-    def _current_uidl_list(conn)
-      conn.mails.map(&:uidl)
     end
   end
 end
