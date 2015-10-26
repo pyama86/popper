@@ -19,10 +19,9 @@ module Popper
       end
 
       accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
-
       while true
-        sleep(60 || Popper.configure.global.interval)
         accounts.each(&:run)
+        sleep(60 || Popper.configure.global.interval)
       end
 
       rescue => e

@@ -36,7 +36,7 @@ module Popper
         rescue Net::POPError => e
           @complete_uidl_list += done_uidls
           Popper.log.warn "pop err write uidl"
-          raise e
+          return
         rescue => e
           error_uidls << m.uidl
           Popper.log.warn e
