@@ -10,13 +10,15 @@ module Popper
     default_task :pop
     desc "pop", "from pop3"
     def pop
-      Popper.init_logger(options)
-      Popper.load_config(options)
-
       if(options[:daemon])
+        Popper.init_logger(options)
         Process.daemon
         open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
+      else
+        Popper.init_logger(options, true)
       end
+
+      Popper.load_config(options)
 
       accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
       while true
