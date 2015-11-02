@@ -14,6 +14,8 @@ module Popper
         @complete_uidl_list = @current_uidl_list unless @complete_uidl_list
         pop(conn)
       end
+      rescue => e
+        Popper.log.warn e
     end
 
     def pop(conn)
