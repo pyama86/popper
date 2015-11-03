@@ -5,22 +5,30 @@ module Popper
   class CLI < Thor
     class_option :config, type: :string, aliases: '-c'
     class_option :log, type: :string, aliases: '-l'
+    class_option :daemon, type: :boolean, aliases: '-d'
+    class_option :pidfile, type: :string, aliases: '-p'
     default_task :pop
     desc "pop", "from pop3"
     def pop
+      if(options[:daemon])
+        Popper.init_logger(options)
+        Process.daemon
+        open(options[:pidfile] || "/var/run/popper.pid" , 'w') {|f| f << Process.pid}
+      else
+        Popper.init_logger(options, true)
+      end
+
       Popper.load_config(options)
-      Popper.init_logger(options)
-      Popper::Pop.run
+
+      accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
+      while true
+        accounts.each(&:run)
+        sleep(60 || Popper.configure.global.interval)
+      end
+
       rescue => e
         Popper.log.fatal(e)
         Popper.log.fatal(e.backtrace)
-    end
-
-    desc "prepop", "get current mailbox all uidl"
-    def prepop
-      Popper.load_config(options)
-      Popper.init_logger(options, true)
-      Popper::Pop.prepop
     end
 
     desc "init", "create home dir"

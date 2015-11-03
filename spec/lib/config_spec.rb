@@ -8,6 +8,10 @@ describe Popper::Config do
     Popper.load_config(options)
   end
 
+  context 'global' do
+    it { expect(Popper.configure.global.interval).to eq 60 }
+  end
+
   context 'condition' do
     it { expect(Popper.configure.accounts.first.condition_by_rule("test_rule").subject).to eq ["^(?!.*Re:).+$", ".*account_rule_subject.*"] }
     it { expect(Popper.configure.accounts.first.condition_by_rule("test_rule").body).to eq [".*account_default_body.*"] }

@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'slack-notifier'
 require 'octokit'
-describe Popper::Pop do
+describe Popper::MailAccount do
   before do
     allow(File).to receive(:open).and_yield(Dummy.new)
     allow(File).to receive(:write).and_return(true)
@@ -11,6 +11,7 @@ describe Popper::Pop do
     before do
       options = {}
       options[:config] = 'spec/fixture/popper_run.conf'
+      options[:log] = '/tmp/popper.log'
       Popper.load_config(options)
       Popper.init_logger(options)
 
@@ -46,22 +47,27 @@ describe Popper::Pop do
       ).and_return(
         { html_url: "https://test.ghe.com/v3/issues/#123" }
       )
+
+      @mail_account = described_class.new(Popper.configure.accounts.first)
+      @mail_account.instance_variable_set(:@complete_uidl_list, [1])
     end
 
-    it { expect(described_class.run).to be_truthy }
+    it { expect(@mail_account.run).to be_truthy }
   end
 
-  describe 'matching?' do
+  describe 'match_rule?' do
     before do
       options = {}
-      options[:config] = 'spec/fixture/popper_matching.conf'
+      options[:config] = 'spec/fixture/popper_match_rule.conf'
+      options[:log] = '/tmp/popper.log'
       Popper.load_config(options)
       Popper.init_logger(options)
+      @mail_account = described_class.new(Popper.configure.accounts.first)
     end
 
-    it { expect(described_class.matching?(Popper.configure.accounts.first, ok_mail)).to be_truthy }
-    it { expect(described_class.matching?(Popper.configure.accounts.first, ng_subject_mail)).to be_falsey }
-    it { expect(described_class.matching?(Popper.configure.accounts.first, ng_body_mail)).to be_falsey }
+    it { expect(@mail_account.match_rule?(ok_mail)).to be_truthy }
+    it { expect(@mail_account.match_rule?(ng_subject_mail)).to be_falsey }
+    it { expect(@mail_account.match_rule?(ng_body_mail)).to be_falsey }
   end
 end
 

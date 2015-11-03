@@ -3,15 +3,16 @@ require 'ostruct'
 require 'logger'
 module Popper
   class Config
-    attr_reader :default, :accounts
+    attr_reader :global, :default, :accounts
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
 
       config = TOML.load_file(config_path)
+      @global  = AccountAttributes.new(config["global"]) if config["global"]
       @default = AccountAttributes.new(config["default"]) if config["default"]
       @accounts = []
 
-      config.select {|k,v| !%w(default).include?(k) }.each do |account|
+      config.select {|k,v| !%w(default global).include?(k) }.each do |account|
         _account = AccountAttributes.new(account[1])
         _account.name = account[0]
         @accounts << _account
@@ -70,7 +71,7 @@ module Popper
   end
 
   def self.load_config(options)
-    config_path = options[:config] || File.join(Dir.home, "popper", "popper.conf")
+    config_path = options[:config] || "/etc/popper.conf"
     @_config = Config.new(config_path)
   end
 

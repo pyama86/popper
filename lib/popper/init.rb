@@ -1,18 +1,20 @@
 module Popper
   class Init
     def self.run(options)
-      dirname = options[:config] || File.join(Dir.home, "popper")
-      unless FileTest.exist?(dirname)
-        FileUtils.mkdir_p(dirname)
-        open("#{dirname}/popper.conf","w") do |e|
+      filename = options[:config] || "/etc/popper.conf"
+      unless FileTest.exist?(filename)
+        open(filename,"w") do |e|
           e.puts sample_config
-        end if FileTest.exist?(dirname)
-        puts "create directry ~/popper"
+        end
+        puts "create sample config #{filename}"
       end
     end
 
     def self.sample_config
       <<-EOS
+[global]
+interval = 60         # fetch interbal default:60
+
 [default.condition]
 subject = ["^(?!.*Re:).+$"]
 

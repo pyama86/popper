@@ -1,0 +1,17 @@
+[Unit]
+Description=Popper
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+User=root
+
+Restart=always
+RestartSec=120
+
+ExecStart=/usr/local/bin/popper --daemon --config /etc/popper.conf --log /var/log/popper.log --pidfile /var/run/popper/popper.pid
+PIDFile=/var/run/popper/popper.pid
+
+[Install]
+WantedBy=multi-user.target
