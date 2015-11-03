@@ -31,6 +31,15 @@ module Popper
         Popper.log.fatal(e.backtrace)
     end
 
+    class_option :config, type: :string, aliases: '-c'
+    desc "show", "show configure"
+    def show
+      Popper.load_config(options)
+      Popper.configure.accounts.each do |account|
+        print_config(account)
+      end
+    end
+
     desc "init", "create home dir"
     def init
       Popper::Init.run(options)
@@ -43,6 +52,22 @@ module Popper
     desc "--version, -v", "print the version"
     def __print_version
       puts "Popper version:#{Popper::VERSION}"
+    end
+
+    no_commands do
+      def print_config(config)
+        puts config.name
+        last_rule = nil
+        last_header = nil
+        config.rule_with_conditions_all? do |rule,mail_header,condition|
+          puts " rule[#{rule}]" if rule != last_rule
+          puts "  header[#{mail_header}]" if mail_header != last_header
+          puts "   #{condition}"
+          last_rule = rule
+          last_header = mail_header
+          true
+        end
+      end
     end
   end
 end
