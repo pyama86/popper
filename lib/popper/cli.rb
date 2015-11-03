@@ -32,8 +32,8 @@ module Popper
     end
 
     class_option :config, type: :string, aliases: '-c'
-    desc "config", "show configure"
-    def config
+    desc "print", "print configure"
+    def print 
       Popper.load_config(options)
       Popper.configure.accounts.each do |account|
         print_config(account)
