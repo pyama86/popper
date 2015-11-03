@@ -70,9 +70,7 @@ module Popper
     def rule_with_conditions_all?(&block)
       rules.to_h.keys.find do |rule|
         condition_by_rule(rule).to_h.all? do |mail_header,conditions|
-          conditions.all? do |condition|
-            block.call(rule, mail_header, condition)
-          end
+          block.call(rule, mail_header, conditions)
         end
       end
     end
