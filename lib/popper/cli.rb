@@ -60,7 +60,7 @@ module Popper
         last_rule = nil
         last_header = nil
 
-        config.rule_with_conditions_all? do |rule,mail_header,condition|
+        config.rule_with_conditions_each do |rule,mail_header,condition|
           puts " "*1 + "rule[#{rule}]" if rule != last_rule
           puts " "*2 + "actions" if rule != last_rule
 
@@ -71,12 +71,11 @@ module Popper
             end
           end if rule != last_rule
 
-          puts " "*2 + "header[#{mail_header}]" if mail_header != last_header
+          puts " "*2 + "header[#{mail_header}]"
           puts " "*3 + "#{condition}"
 
           last_rule = rule
           last_header = mail_header
-          true
         end
       end
     end
