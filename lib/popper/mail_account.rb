@@ -51,8 +51,11 @@ module Popper
 
     def session_start(&block)
       pop = Net::POP3.new(@config.login.server, @config.login.port || 110)
-      pop.open_timeout = ENV['POP_TIMEOUT'] || 120
-      pop.read_timeout = ENV['POP_TIMEOUT'] || 120
+      %w(
+        open_timeout
+        read_timeout
+      ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
+
       pop.start(
         @config.login.user,
         @config.login.password
@@ -69,9 +72,11 @@ module Popper
     end
 
     def match_rule?(mail)
-      @config.rule_with_conditions_all? do |rule, mail_header, conditions|
-        conditions.all? do |condition|
-          mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
+      @config.rules.to_h.keys.find do |rule|
+        @config.condition_by_rule(rule).to_h.all? do |mail_header,conditions|
+          conditions.all? do |condition|
+            mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
+          end
         end
       end
     end

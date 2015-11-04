@@ -66,22 +66,6 @@ module Popper
         AccountAttributes.new(hash)
       end
     end
-
-    def rule_with_conditions_all?(&block)
-      rules.to_h.keys.find do |rule|
-        condition_by_rule(rule).to_h.all? do |mail_header,conditions|
-          block.call(rule, mail_header, conditions)
-        end
-      end
-    end
-
-    def rule_with_conditions_each(&block)
-      rules.to_h.keys.each do |rule|
-        condition_by_rule(rule).to_h.each do |mail_header,conditions|
-          block.call(rule, mail_header, conditions)
-        end
-      end
-    end
   end
 
   def self.load_config(options)

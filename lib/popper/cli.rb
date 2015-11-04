@@ -21,9 +21,15 @@ module Popper
       Popper.load_config(options)
 
       accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
+      interval = case
+                 when Popper.configure.global.respond_to?(:interval)
+                   Popper.configure.global.interval
+                 else
+                   60
+                 end
       while true
         accounts.each(&:run)
-        sleep(60 || Popper.configure.global.interval)
+        sleep(interval)
       end
 
       rescue => e
@@ -33,7 +39,7 @@ module Popper
 
     class_option :config, type: :string, aliases: '-c'
     desc "print", "print configure"
-    def print 
+    def print
       Popper.load_config(options)
       Popper.configure.accounts.each do |account|
         print_config(account)
@@ -59,22 +65,27 @@ module Popper
         last_rule = nil
         puts config.name
 
-        config.rule_with_conditions_each do |rule,mail_header,condition|
-          if rule != last_rule
-            puts " "*1 + "rule[#{rule}]"
-            puts " "*2 + "actions"
-
-            config.action_by_rule(rule).each_pair do |action,params|
-              puts " "*3 + "#{action}"
-              params.each_pair do |k,v|
-                puts " "*4 + "#{k} #{v}"
-              end
+        config.rules.to_h.keys.each do |rule|
+          config.condition_by_rule(rule).to_h.each do |mail_header,conditions|
+            if rule != last_rule
+              puts " "*1 + "rule[#{rule}]"
+              puts " "*2 + "actions"
+              print_action(config, rule)
             end
-          end
 
-          puts " "*2 + "header[#{mail_header}]"
-          puts " "*3 + "#{condition}"
-          last_rule = rule
+            puts " "*2 + "header[#{mail_header}]"
+            puts " "*3 + "#{conditions}"
+            last_rule = rule
+          end
+        end
+      end
+
+      def print_action(config, rule)
+        config.action_by_rule(rule).each_pair do |action,params|
+          puts " "*3 + "#{action}"
+          params.each_pair do |k,v|
+            puts " "*4 + "#{k} #{v}"
+          end
         end
       end
     end
