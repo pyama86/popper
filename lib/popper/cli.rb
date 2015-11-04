@@ -56,26 +56,25 @@ module Popper
 
     no_commands do
       def print_config(config)
-        puts config.name
         last_rule = nil
-        last_header = nil
+        puts config.name
 
         config.rule_with_conditions_each do |rule,mail_header,condition|
-          puts " "*1 + "rule[#{rule}]" if rule != last_rule
-          puts " "*2 + "actions" if rule != last_rule
+          if rule != last_rule
+            puts " "*1 + "rule[#{rule}]"
+            puts " "*2 + "actions"
 
-          config.action_by_rule(rule).each_pair do |action,params|
-            puts " "*3 + "#{action}"
-            params.each_pair do |k,v|
-              puts " "*4 + "#{k} #{v}"
+            config.action_by_rule(rule).each_pair do |action,params|
+              puts " "*3 + "#{action}"
+              params.each_pair do |k,v|
+                puts " "*4 + "#{k} #{v}"
+              end
             end
-          end if rule != last_rule
+          end
 
           puts " "*2 + "header[#{mail_header}]"
           puts " "*3 + "#{condition}"
-
           last_rule = rule
-          last_header = mail_header
         end
       end
     end
