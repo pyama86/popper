@@ -19,6 +19,9 @@ To post a variety of services by analyzing the email
   # edit popper.conf
   $ vi /etc/popper.conf
 
+  # print config
+  $ popper print
+
   $ popper --daemon --config /etc/popper.conf --log /var/log/popper.log --pidfile /var/run/popper/popper.pid
 ```
 systmd service config: https://github.com/pyama86/popper/tree/master/init_script/cent7/etc/systemd/system/popper.service
