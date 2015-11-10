@@ -39,6 +39,19 @@ module Popper
       @hash_table
     end
 
+    [
+      %w(find all?),
+      %w(each each),
+    ].each do |arr|
+      define_method("rule_with_conditions_#{arr[0]}") do |&blk|
+        self.rules.to_h.keys.send(arr[0]) do |rule|
+          self.condition_by_rule(rule).to_h.send(arr[1]) do |mail_header,conditions|
+            blk.call(rule, mail_header, conditions)
+          end
+        end
+      end
+    end
+
     %w(
       condition
       action
@@ -59,10 +72,13 @@ module Popper
         end
       }
 
+      # merge global default and account default
       define_method("#{name}_by_rule") do |rule|
         hash = self.send("global_default_#{name}")
         hash = hash.deep_merge(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
         hash = hash.deep_merge(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
+
+        # replace body to utf_body
         AccountAttributes.new(Hash[hash.map {|k,v| [k.to_s.gsub(/^body$/, "utf_body").to_sym, v]}])
       end
     end

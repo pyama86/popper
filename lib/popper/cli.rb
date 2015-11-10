@@ -65,18 +65,16 @@ module Popper
         last_rule = nil
         puts config.name
 
-        config.rules.to_h.keys.each do |rule|
-          config.condition_by_rule(rule).to_h.each do |mail_header,conditions|
-            if rule != last_rule
-              puts " "*1 + "rule[#{rule}]"
-              puts " "*2 + "actions"
-              print_action(config, rule)
-            end
-
-            puts " "*2 + "header[#{mail_header}]"
-            puts " "*3 + "#{conditions}"
-            last_rule = rule
+        config.rule_with_conditions_each do |rule,mail_header,conditions|
+          if rule != last_rule
+            puts " "*1 + "rule[#{rule}]"
+            puts " "*2 + "actions"
+            print_action(config, rule)
           end
+
+          puts " "*2 + "header[#{mail_header}]"
+          puts " "*3 + "#{conditions}"
+          last_rule = rule
         end
       end
 
