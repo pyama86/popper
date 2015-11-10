@@ -100,6 +100,11 @@ class EncodeMail < Mail::Message
   end
 
   def body
-    super.decoded.encode("UTF-8", self.charset)
+    if multipart?
+      text_part.decoded.encode("UTF-8", charset) if text_part
+      html_part.decoded.encode("UTF-8", charset) if html_part
+    else
+      super.decoded.encode("UTF-8", charset)
+    end
   end
 end
