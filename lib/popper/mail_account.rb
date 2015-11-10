@@ -99,12 +99,15 @@ class EncodeMail < Mail::Message
     Kconv.toutf8(self[:Subject].value) if self[:Subject]
   end
 
-  def body
+  def utf_body
     if multipart?
-      text_part.decoded.encode("UTF-8", charset) if text_part
-      html_part.decoded.encode("UTF-8", charset) if html_part
+      if text_part
+        text_part.decoded.encode("UTF-8", charset)
+      elsif html_part
+        html_part.decoded.encode("UTF-8", charset)
+      end
     else
-      super.decoded.encode("UTF-8", charset)
+      body.decoded.encode("UTF-8", charset)
     end
   end
 end

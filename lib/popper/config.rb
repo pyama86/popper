@@ -63,7 +63,7 @@ module Popper
         hash = self.send("global_default_#{name}")
         hash = hash.deep_merge(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
         hash = hash.deep_merge(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
-        AccountAttributes.new(hash)
+        AccountAttributes.new(Hash[hash.map {|k,v| [k.to_s.gsub(/^body$/, "utf_body").to_sym, v]}])
       end
     end
   end
