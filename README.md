@@ -49,8 +49,9 @@ message = "default message"
 server = "example.com"
 user = "example@example.com"
 password = "password"
-port = 110(default)
-protocol = "pop"(default)
+port = 110 (default: <pop:110> <imap:143>)
+protocol = "pop" (default:pop)
+ssl = false (default:false)
 
 # <account_name>.default.condition
 [example.default.condition]
