@@ -13,6 +13,7 @@ module Popper::Protocol
         read_timeout
       ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
 
+      pop.enable_ssl if config.login.ssl
       pop.start(
         config.login.user,
         config.login.password
