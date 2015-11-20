@@ -49,7 +49,7 @@ describe Popper::MailAccount do
       )
 
       @mail_account = described_class.new(Popper.configure.accounts.first)
-      @mail_account.instance_variable_set(:@complete_uidl_list, [1])
+      @mail_account.instance_variable_set(:@complete_list, [1])
     end
 
     it { expect(@mail_account.run).to be_truthy }
@@ -96,21 +96,21 @@ Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network)
 end
 
 def ok_mail
-  mail = EncodeMail.new
+  mail = PopMail.new
   mail.subject = "test ok"
   mail.body    = "test ok"
   mail
 end
 
 def ng_body_mail
-  mail = EncodeMail.new
+  mail = PopMail.new
   mail.subject = "test ok"
   mail.body    = "test ng"
   mail
 end
 
 def ng_subject_mail
-  mail = EncodeMail.new
+  mail = PopMail.new
   mail.subject = "test ng"
   mail.body    = "test ok"
   mail
