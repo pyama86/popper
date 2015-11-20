@@ -7,9 +7,9 @@ module Popper
     class_option :log, type: :string, aliases: '-l'
     class_option :daemon, type: :boolean, aliases: '-d'
     class_option :pidfile, type: :string, aliases: '-p'
-    default_task :pop
-    desc "pop", "from pop3"
-    def pop
+    default_task :check
+    desc "check", "check mail"
+    def check
       if(options[:daemon])
         Popper.init_logger(options)
         Process.daemon
@@ -36,6 +36,7 @@ module Popper
         Popper.log.fatal(e)
         Popper.log.fatal(e.backtrace)
     end
+    map pop: :check
 
     class_option :config, type: :string, aliases: '-c'
     desc "print", "print configure"
