@@ -4,75 +4,56 @@ require 'kconv'
 
 module Popper
   class MailAccount
+    attr_accessor :protocol, :config, :complete_list
+
     def initialize(config)
-      @config = config
+      self.config = config
+      self.protocol = Popper::Protocol::Pop.new(config)
     end
 
     def run
-      session_start do |conn|
-        @current_uidl_list = conn.mails.map(&:uidl)
-        @complete_uidl_list = @current_uidl_list unless @complete_uidl_list
-        pop(conn)
+      protocol.session_start do
+        self.complete_list = protocol.current_list unless complete_list
+        check
       end
       rescue => e
         Popper.log.warn e
     end
 
-    def pop(conn)
-      done_uidls = []
-      error_uidls = []
+    def check
+      done_list = []
+      error_list = []
 
-      Popper.log.info "start popper #{@config.name}"
+      Popper.log.info "start popper #{config.name}"
 
-      process_uidl_list(conn).each do |m|
+      protocol.process_list(complete_list).each do |m|
         begin
-          mail = EncodeMail.new(m.mail)
+          mail = protocol.get_mail(m)
           Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
 
           if rule = match_rule?(mail)
             Popper.log.info "do action:#{mail.subject}"
-            Popper::Action::Git.run(@config.action_by_rule(rule), mail) if @config.action_by_rule(rule)
+            Popper::Action::Git.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
           end
-          done_uidls << m.uidl
+          done_list << protocol.current_id
 
-        rescue Net::POPError => e
-          @complete_uidl_list += done_uidls
-          Popper.log.warn "pop err write uidl"
+        rescue Popper::ConnectonError => e
+          self.complete_list += done_list
+          Popper.log.warn "err write session"
           return
         rescue => e
-          error_uidls << m.uidl
+          error_list << protocol.current_id
           Popper.log.warn e
         end
       end
 
-      @complete_uidl_list = @current_uidl_list - error_uidls
-      Popper.log.info "success popper #{@config.name}"
+      self.complete_list = protocol.current_list - error_list
+      Popper.log.info "success popper #{config.name}"
     end
 
-    def session_start(&block)
-      pop = Net::POP3.new(@config.login.server, @config.login.port || 110)
-      %w(
-        open_timeout
-        read_timeout
-      ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
-
-      pop.start(
-        @config.login.user,
-        @config.login.password
-      ) do |pop|
-        Popper.log.info "connect server #{@config.name}"
-        block.call(pop)
-        Popper.log.info "disconnect server #{@config.name}"
-      end
-    end
-
-    def process_uidl_list(conn)
-      uidl_list = @current_uidl_list - @complete_uidl_list
-      conn.mails.select {|_m|uidl_list.include?(_m.uidl)}
-    end
 
     def match_rule?(mail)
-      @config.rule_with_conditions_find do |rule,mail_header,conditions|
+      config.rule_with_conditions_find do |rule,mail_header,conditions|
         conditions.all? do |condition|
           mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
         end
@@ -92,20 +73,3 @@ class ::Hash
   end
 end
 
-class EncodeMail < Mail::Message
-  def subject
-    Kconv.toutf8(self[:Subject].value) if self[:Subject]
-  end
-
-  def utf_body
-    if multipart?
-      if text_part
-        text_part.decoded.encode("UTF-8", charset)
-      elsif html_part
-        html_part.decoded.encode("UTF-8", charset)
-      end
-    else
-      body.decoded.encode("UTF-8", charset)
-    end
-  end
-end

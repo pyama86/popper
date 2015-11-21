@@ -5,6 +5,8 @@ require 'popper/mail_account'
 require "popper/config"
 require "popper/action"
 require "popper/init"
+require "popper/popper_error"
+require "popper/protocol"
 
 module Popper
   def self.init_logger(options, stdout=nil)
