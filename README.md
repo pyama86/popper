@@ -44,7 +44,7 @@ user = "slack"
 channel = "#default_channel"
 message = "default message"
 
-# [config_name].login
+# <user_name>.login
 [example.login]
 
 server = "example.com"
@@ -53,20 +53,20 @@ password = "password"
 port = 110(default)
 ssl = false
 
-# [config_name].default.condition
+# <user_name>.default.condition
 [example.default.condition]
 subject = [".*default.*"]
 
-# [config_name].default.action.[action_name]
+# <user_name>.default.action.<action_name>
 [example.default.action.slack]
 channel = "#account default"
 
-# [config_name].rules.[rule_name].condition
+# <user_name>.rules.<rule_name>.condition
 [example.rules.normal_log.condition]
 
 subject = [".*Webmailer Exception.*"]
 
-# [config_name].rules.[rule_name].action.[action_name]
+# <user_name>.rules.<rule_name>.action.<action_name>
 [example.rules.normal_log.action.slack]
 
 channel = "#channel"
