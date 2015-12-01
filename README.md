@@ -29,6 +29,7 @@ systmd service config: https://github.com/pyama86/popper/tree/master/init_script
 # configure(toml)
 ## ~/popper/popper.conf
 ```
+include = ["/etc/popper/*.conf"]
 [global]
 interval = 60         # fetch interbal default:60
 
