@@ -7,10 +7,9 @@ module Popper
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
       config = TOML.load_file(config_path)
-
       if config.key?("include")
         content = config["include"].map {|p| Dir.glob(p).map {|f|File.read(f)}}.join("\n")
-        config = TOML::Parser.new(content).parsed
+        config.deep_merge!(TOML::Parser.new(content).parsed)
       end
 
       @global  = AccountAttributes.new(config["global"]) if config["global"]
