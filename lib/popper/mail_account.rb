@@ -51,6 +51,8 @@ module Popper
 
     def session_start(&block)
       pop = Net::POP3.new(@config.login.server, @config.login.port || 110)
+      pop.enable_ssl if @config.login.respond_to?(:ssl) && @config.login.ssl
+
       %w(
         open_timeout
         read_timeout
