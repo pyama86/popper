@@ -50,6 +50,7 @@ server = "example.com"
 user = "example@example.com"
 password = "password"
 port = 110(default)
+ssl = false
 
 # [config_name].default.condition
 [example.default.condition]
