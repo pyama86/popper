@@ -4,14 +4,16 @@ require 'kconv'
 
 module Popper
   class MailAccount
+    attr_accessor :config, :current_list, :complete_list
+
     def initialize(config)
-      @config = config
+      self.config = config
     end
 
     def run
       session_start do |conn|
-        @current_uidl_list = conn.mails.map(&:uidl)
-        @complete_uidl_list = @current_uidl_list unless @complete_uidl_list
+        self.current_list = conn.mails.map(&:uidl)
+        self.complete_list = current_list unless complete_list
         pop(conn)
       end
       rescue => e
@@ -22,7 +24,7 @@ module Popper
       done_uidls = []
       error_uidls = []
 
-      Popper.log.info "start popper #{@config.name}"
+      Popper.log.info "start popper #{config.name}"
 
       process_uidl_list(conn).each do |m|
         begin
@@ -31,12 +33,12 @@ module Popper
 
           if rule = match_rule?(mail)
             Popper.log.info "do action:#{mail.subject}"
-            Popper::Action::Git.run(@config.action_by_rule(rule), mail) if @config.action_by_rule(rule)
+            Popper::Action::Git.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
           end
           done_uidls << m.uidl
 
         rescue Net::POPError => e
-          @complete_uidl_list += done_uidls
+          self.complete_list += done_uidls
           Popper.log.warn "pop err write uidl"
           return
         rescue => e
@@ -45,34 +47,36 @@ module Popper
         end
       end
 
-      @complete_uidl_list = @current_uidl_list - error_uidls
-      Popper.log.info "success popper #{@config.name}"
+      self.complete_list = current_list - error_uidls
+      Popper.log.info "success popper #{config.name}"
     end
 
     def session_start(&block)
-      pop = Net::POP3.new(@config.login.server, @config.login.port || 110)
+      pop = Net::POP3.new(config.login.server, config.login.port || 110)
+      pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
+
       %w(
         open_timeout
         read_timeout
       ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
 
       pop.start(
-        @config.login.user,
-        @config.login.password
+        config.login.user,
+        config.login.password
       ) do |pop|
-        Popper.log.info "connect server #{@config.name}"
+        Popper.log.info "connect server #{config.name}"
         block.call(pop)
-        Popper.log.info "disconnect server #{@config.name}"
+        Popper.log.info "disconnect server #{config.name}"
       end
     end
 
     def process_uidl_list(conn)
-      uidl_list = @current_uidl_list - @complete_uidl_list
+      uidl_list = current_list - complete_list
       conn.mails.select {|_m|uidl_list.include?(_m.uidl)}
     end
 
     def match_rule?(mail)
-      @config.rule_with_conditions_find do |rule,mail_header,conditions|
+      config.rule_with_conditions_find do |rule,mail_header,conditions|
         conditions.all? do |condition|
           mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
         end

@@ -49,7 +49,7 @@ describe Popper::MailAccount do
       )
 
       @mail_account = described_class.new(Popper.configure.accounts.first)
-      @mail_account.instance_variable_set(:@complete_uidl_list, [1])
+      @mail_account.instance_variable_set(:@complete_list, [1])
     end
 
     it { expect(@mail_account.run).to be_truthy }
