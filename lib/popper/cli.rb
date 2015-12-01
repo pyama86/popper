@@ -42,7 +42,7 @@ module Popper
     def print
       Popper.load_config(options)
       Popper.configure.accounts.each do |account|
-        print_config(account) if account.name != "include"
+        print_config(account)
       end
     end
 

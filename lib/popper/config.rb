@@ -9,6 +9,7 @@ module Popper
       config = TOML.load_file(config_path)
       if config.key?("include")
         content = config["include"].map {|p| Dir.glob(p).map {|f|File.read(f)}}.join("\n")
+        config.delete("include")
         config.deep_merge!(TOML::Parser.new(content).parsed)
       end
 
