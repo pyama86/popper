@@ -3,30 +3,26 @@ require 'ostruct'
 require 'logger'
 module Popper
   class Config
-    attr_reader :global, :default, :accounts
+    attr_reader :default, :accounts, :interval
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
       config = read_file(config_path)
 
-      @global  = AccountAttributes.new(config["global"]) if config["global"]
+      @interval = config["interval"] if config.key?("interval")
       @default = AccountAttributes.new(config["default"]) if config["default"]
-      @accounts = []
-
-      config.reject {|k,v| %w(default global).include?(k) }.each do |account|
+      @accounts = config.select {|k,v| v.is_a?(Hash) && v.key?("login") }.map do |account|
         _account = AccountAttributes.new(account[1])
         _account.name = account[0]
-        @accounts << _account
+        _account
       end
     end
 
     def read_file(file)
       config = TOML.load_file(file)
-
       if config.key?("include")
         content = config["include"].map {|p| Dir.glob(p).map {|f|File.read(f)}}.join("\n")
         config.deep_merge!(TOML::Parser.new(content).parsed)
       end
-
       config
     end
   end
@@ -66,7 +62,7 @@ module Popper
       condition
       action
     ).each do |name|
-      define_method("global_default_#{name}") {
+      define_method("default_#{name}") {
         begin
           Popper.configure.default.send(name).to_h
         rescue
@@ -82,9 +78,9 @@ module Popper
         end
       }
 
-      # merge global default and account default
+      # merge default and account default
       define_method("#{name}_by_rule") do |rule|
-        hash = self.send("global_default_#{name}")
+        hash = self.send("default_#{name}")
         hash = hash.deep_merge(self.send("account_default_#{name}").to_h) if self.send("account_default_#{name}")
         hash = hash.deep_merge(self.rules.send(rule).send(name).to_h) if rules.send(rule).respond_to?(name.to_sym)
 
