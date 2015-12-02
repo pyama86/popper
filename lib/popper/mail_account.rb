@@ -28,10 +28,7 @@ module Popper
 
       process_uidl_list(conn).each do |m|
         begin
-          mail = EncodeMail.new(m.mail)
-          Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
-          done_uidls << chack_and_action(mail)
-
+          done_uidls << check_and_action(m)
         rescue Net::POPError => e
           self.complete_list += done_uidls
           Popper.log.warn "pop err write uidl"
@@ -46,12 +43,16 @@ module Popper
       Popper.log.info "success popper #{config.name}"
     end
 
-    def check_and_action(mail)
+    def check_and_action(m)
+      mail = EncodeMail.new(m.mail)
+      Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
+
       if rule = match_rule?(mail)
         Popper.log.info "do action:#{mail.subject}"
         Popper::Action::Git.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
       end
-      mail.uidl
+
+      m.uidl
     end
 
     def session_start(&block)
