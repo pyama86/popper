@@ -24,16 +24,9 @@ module Popper
         MailAccount.new(account)
       end.compact
 
-      interval = case
-      when Popper.configure.respond_to?(:interval)
-        Popper.configure.interval
-      else
-        60
-      end
-
       while true
         accounts.each(&:run)
-        sleep(interval)
+        sleep(Popper.configure.interval)
       end
 
       rescue => e

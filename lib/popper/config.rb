@@ -8,7 +8,7 @@ module Popper
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
       config = read_file(config_path)
 
-      @interval = config["interval"] if config.key?("interval")
+      @interval = config.key?("interval") ? config["interval"].to_i : 60
       @default = AccountAttributes.new(config["default"]) if config["default"]
       @accounts = config.select {|k,v| v.is_a?(Hash) && v.key?("login") }.map do |account|
         _account = AccountAttributes.new(account[1])
