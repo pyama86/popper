@@ -56,21 +56,27 @@ module Popper
 
     def session_start(&block)
       pop = Net::POP3.new(config.login.server, config.login.port || 110)
-      pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
-
-      %w(
-        open_timeout
-        read_timeout
-      ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
+      pop = set_pop_option(pop)
 
       pop.start(
         config.login.user,
         config.login.password
-      ) do |pop|
+      ) do |conn|
         Popper.log.info "connect server #{config.name}"
-        block.call(pop)
+        block.call(conn)
         Popper.log.info "disconnect server #{config.name}"
       end
+    end
+
+    def set_pop_option(pop)
+      pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
+      %w(
+        open_timeout
+        read_timeout
+      ).each do |m|
+        pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120)
+      end
+      pop
     end
 
     def process_uidl_list(conn)
