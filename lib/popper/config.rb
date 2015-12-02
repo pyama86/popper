@@ -6,24 +6,30 @@ module Popper
     attr_reader :global, :default, :accounts
     def initialize(config_path)
       raise "configure not fond #{config_path}" unless File.exist?(config_path)
-      config = TOML.load_file(config_path)
+      config = read_file(config_path)
+
+      @global  = AccountAttributes.new(config["global"]) if config["global"]
+      @default = AccountAttributes.new(config["default"]) if config["default"]
+      @accounts = []
+
+      config.reject {|k,v| %w(default global).include?(k) }.each do |account|
+        _account = AccountAttributes.new(account[1])
+        _account.name = account[0]
+        @accounts << _account
+      end
+    end
+
+    def read_file(file)
+      config = TOML.load_file(file)
+
       if config.key?("include")
         content = config["include"].map {|p| Dir.glob(p).map {|f|File.read(f)}}.join("\n")
         config.delete("include")
         config.deep_merge!(TOML::Parser.new(content).parsed)
       end
 
-      @global  = AccountAttributes.new(config["global"]) if config["global"]
-      @default = AccountAttributes.new(config["default"]) if config["default"]
-      @accounts = []
-
-      config.select {|k,v| !%w(default global).include?(k) }.each do |account|
-        _account = AccountAttributes.new(account[1])
-        _account.name = account[0]
-        self.accounts << _account
-      end
+      config
     end
-
   end
 
   class AccountAttributes < OpenStruct
