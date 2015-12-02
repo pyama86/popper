@@ -20,7 +20,9 @@ module Popper
 
       Popper.load_config(options)
 
-      accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
+      accounts = Popper.configure.accounts.map do |account|
+        MailAccount.new(account) if account.respond_to?(:login)
+      end.compact
       interval = case
                  when Popper.configure.global.respond_to?(:interval)
                    Popper.configure.global.interval
