@@ -28,15 +28,7 @@ module Popper
 
       process_uidl_list(conn).each do |m|
         begin
-          mail = EncodeMail.new(m.mail)
-          Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
-
-          if rule = match_rule?(mail)
-            Popper.log.info "do action:#{mail.subject}"
-            Popper::Action::Git.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
-          end
-          done_uidls << m.uidl
-
+          done_uidls << check_and_action(m)
         rescue Net::POPError => e
           self.complete_list += done_uidls
           Popper.log.warn "pop err write uidl"
@@ -51,23 +43,41 @@ module Popper
       Popper.log.info "success popper #{config.name}"
     end
 
+    def check_and_action(m)
+      mail = EncodeMail.new(m.mail)
+      Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
+
+      if rule = match_rule?(mail)
+        Popper.log.info "do action:#{mail.subject}"
+        Popper::Action::Git.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
+      end
+
+      m.uidl
+    end
+
     def session_start(&block)
       pop = Net::POP3.new(config.login.server, config.login.port || 110)
-      pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
-
-      %w(
-        open_timeout
-        read_timeout
-      ).each {|m| pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120) }
+      pop = set_pop_option(pop)
 
       pop.start(
         config.login.user,
         config.login.password
-      ) do |pop|
+      ) do |conn|
         Popper.log.info "connect server #{config.name}"
-        block.call(pop)
+        block.call(conn)
         Popper.log.info "disconnect server #{config.name}"
       end
+    end
+
+    def set_pop_option(pop)
+      pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
+      %w(
+        open_timeout
+        read_timeout
+      ).each do |m|
+        pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120)
+      end
+      pop
     end
 
     def process_uidl_list(conn)

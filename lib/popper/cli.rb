@@ -20,16 +20,13 @@ module Popper
 
       Popper.load_config(options)
 
-      accounts = Popper.configure.accounts.map {|account| MailAccount.new(account)}
-      interval = case
-                 when Popper.configure.global.respond_to?(:interval)
-                   Popper.configure.global.interval
-                 else
-                   60
-                 end
+      accounts = Popper.configure.accounts.map do |account|
+        MailAccount.new(account)
+      end.compact
+
       while true
         accounts.each(&:run)
-        sleep(interval)
+        sleep(Popper.configure.interval)
       end
 
       rescue => e

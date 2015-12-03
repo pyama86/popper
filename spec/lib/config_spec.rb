@@ -5,7 +5,7 @@ describe Popper::Config do
 
   shared_examples_for 'check_config' do
     context 'global' do
-      it { expect(Popper.configure.global.interval).to eq 60 }
+      it { expect(Popper.configure.interval).to eq 60 }
     end
 
     context 'condition' do

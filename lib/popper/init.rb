@@ -12,7 +12,6 @@ module Popper
 
     def self.sample_config
       <<-EOS
-[global]
 interval = 60         # fetch interbal default:60
 
 [default.condition]
