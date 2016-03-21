@@ -16,6 +16,5 @@ module Popper::Action
     end
 
     next_action(Slack)
-    action(:ghe)
   end
 end
