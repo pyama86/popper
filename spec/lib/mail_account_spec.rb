@@ -17,6 +17,13 @@ describe Popper::MailAccount do
 
       allow_any_instance_of(Net::POP3).to receive(:start).and_yield(dummy_pop)
 
+      ## exec command
+      expect_any_instance_of(Object).to receive(:system).with(
+        "test_command",
+        "default_condition account_rule_condition_subject",
+        "account_default_condition account_rule_condition_body\n"
+      ).and_return(true)
+
       # slack
       expect_any_instance_of(Slack::Notifier).to receive(:ping).with(
         "default_action_slack git:https://test.git.com/v3/issues/#123 ghe:https://test.ghe.com/v3/issues/#123",
@@ -39,6 +46,7 @@ describe Popper::MailAccount do
       ).and_return(
         { html_url: "https://test.git.com/v3/issues/#123" }
       )
+
       # ghe
       allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "example/account_rule_action_ghe",
