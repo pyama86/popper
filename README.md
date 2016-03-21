@@ -7,6 +7,7 @@
 To post a variety of services by analyzing the email
 * slack notification
 * create issue to github.com or ghe
+* exec arbitrary commands
 
 # install
   $ gem install popper
@@ -73,8 +74,10 @@ mentions = ["@user"]
 message = "webmailer error mail"
 
 [example.rules.normal_log.action.git]
-
 repo = "example/fuu"
+
+[example.rules.normal_log.action.exec_cmd]
+repo = "/path/to/other_command.rb"
 
 [example2.login]
 user = "example2@example.com"

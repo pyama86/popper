@@ -32,6 +32,5 @@ module Popper::Action
       @action_config.respond_to?(:webhook_url)
     end
 
-    action(:slack)
   end
 end

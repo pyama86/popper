@@ -1,19 +1,18 @@
 module Popper::Action
   class Base
     @next_action = nil
-    @action = nil
     @action_config = nil
 
     def self.run(config, mail, params={})
-      @action_config = config.send(self.action) if config.respond_to?(self.action)
+      @action_config = config.send(action_name) if config.respond_to?(action_name)
       begin
-        Popper.log.info "run action #{self.action}"
+        Popper.log.info "run action #{action_name}"
         params = task(mail, params)
-        Popper.log.info "exit action #{self.action}"
+        Popper.log.info "exit action #{action_name}"
       rescue => e
         Popper.log.warn e
         Popper.log.warn e.backtrace
-      end if action?
+      end if do_action?
       next_run(config, mail, params)
     end
 
@@ -22,18 +21,20 @@ module Popper::Action
       @next_action
     end
 
-    def self.action(action=nil)
-      @action = action if action
-      @action
-    end
-
     def self.next_run(config, mail, params={})
       @next_action.run(config, mail, params) if @next_action
     end
 
-    def self.action?
+    def self.do_action?
       @action_config && check_params
     end
+
+    def self.action_name
+      self.name.split('::').last.downcase.to_sym
+    end
+
+
+
     def self.check_params; end
   end
 end

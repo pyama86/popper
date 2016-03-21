@@ -8,7 +8,7 @@ module Popper::Action
         mail.subject,
         mail.utf_body
       )
-      params["#{self.action}_url".to_sym] = url[:html_url] if url
+      params["#{action_name}_url".to_sym] = url[:html_url] if url
       params
     end
 
@@ -23,6 +23,5 @@ module Popper::Action
     end
 
     next_action(Ghe)
-    action(:git)
   end
 end
