@@ -52,6 +52,7 @@ user = "example@example.com"
 password = "password"
 port = 110(default)
 ssl = false
+delete_after = false
 
 # <user_name>.default.condition
 [example.default.condition]

@@ -91,6 +91,10 @@ def dummy_pop
     pop_mail = Net::POPMail.new(nil, nil, nil, nil)
     pop_mail.uid = 100
 
+    def pop_mail.delete
+      true
+    end
+
     def pop_mail.mail
       <<-EOS
 Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network); 10 Sep 2015 16:20:10 +0900\r\nTo: example@example.com\r\nSubject: default_condition account_rule_condition_subject\r\nFrom:no-reply@example.com\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=ISO-2022-JP\r\nContent-Transfer-Encoding: 7bit\r\nMessage-Id: <20150910072010.0545296845A@example.com>\r\nDate: Thu, 10 Sep 2015 16:20:10 +0900 (JST)\r\n\r\naccount_default_condition account_rule_condition_body
