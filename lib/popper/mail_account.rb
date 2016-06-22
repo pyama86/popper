@@ -29,6 +29,7 @@ module Popper
       process_uidl_list(conn).each do |m|
         begin
           done_uidls << check_and_action(m)
+          m.delete if config.login.respond_to?(:delete_after) && config.login.delete_after
         rescue Net::POPError => e
           self.complete_list += done_uidls
           Popper.log.warn "pop err write uidl"
