@@ -1,3 +1,4 @@
+require 'bundler'
 module Popper::Action
   class ExecCmd < Base
     def self.task(mail, params={})
