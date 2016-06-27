@@ -78,7 +78,7 @@ message = "webmailer error mail"
 repo = "example/fuu"
 
 [example.rules.normal_log.action.exec_cmd]
-repo = "/path/to/other_command.rb"
+cmd = "/path/to/other_command.rb"
 
 [example2.login]
 user = "example2@example.com"
