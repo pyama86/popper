@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'thor'
-  spec.add_dependency 'bundler'
   spec.add_dependency 'slack-notifier'
   spec.add_dependency 'toml'
   spec.add_dependency 'mail'
