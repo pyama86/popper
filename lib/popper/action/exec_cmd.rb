@@ -1,7 +1,9 @@
 module Popper::Action
   class ExecCmd < Base
     def self.task(mail, params={})
-      system(@action_config.cmd, mail.subject, mail.utf_body, mail.from.join(";"), mail.to.join(";"))
+      Bundler.with_clean_env do
+        system("#{@action_config.cmd} '#{mail.subject}' '#{mail.utf_body}' '#{mail.from.join(";")}' '#{mail.to.join(";")}'")
+      end
       params
     end
 
