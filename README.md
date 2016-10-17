@@ -76,6 +76,7 @@ message = "webmailer error mail"
 
 [example.rules.normal_log.action.git]
 repo = "example/fuu"
+labels = "label1,label2"
 
 [example.rules.normal_log.action.exec_cmd]
 cmd = "/path/to/other_command.rb"
