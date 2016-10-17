@@ -19,11 +19,11 @@ describe Popper::MailAccount do
 
       ## exec command
       expect_any_instance_of(Object).to receive(:system).with(
-        "test_command",
-        "default_condition account_rule_condition_subject",
-        "account_default_condition account_rule_condition_body\n",
-        "no-reply@example.com",
-        "example@example.com",
+        "test_command " \
+        "'default_condition account_rule_condition_subject' " \
+        "'account_default_condition account_rule_condition_body\n' " \
+        "'no-reply@example.com' " \
+        "'example@example.com'"
       ).and_return(true)
 
       # slack
