@@ -44,7 +44,8 @@ describe Popper::MailAccount do
       allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "example/account_rule_action_git",
         "default_condition account_rule_condition_subject",
-        "account_default_condition account_rule_condition_body\n"
+        "account_default_condition account_rule_condition_body\n",
+        { labels: "first_gh_label,second_gh_label" }
       ).and_return(
         { html_url: "https://test.git.com/v3/issues/#123" }
       )
@@ -53,7 +54,8 @@ describe Popper::MailAccount do
       allow_any_instance_of(Octokit::Client).to receive(:create_issue).with(
         "example/account_rule_action_ghe",
         "default_condition account_rule_condition_subject",
-        "account_default_condition account_rule_condition_body\n"
+        "account_default_condition account_rule_condition_body\n",
+        { labels: "first_ghe_label,second_ghe_label" }
       ).and_return(
         { html_url: "https://test.ghe.com/v3/issues/#123" }
       )
