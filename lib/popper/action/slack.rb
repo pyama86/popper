@@ -11,9 +11,10 @@ module Popper::Action
 
       note = {
         pretext: mail.date.to_s,
-        text: mail.subject,
+        title: mail.subject,
         color: "good"
       }
+      note[:text] = mail.utf_body if @action_config.use_body
 
       body = @action_config.message || "popper mail notification"
       body += " #{@action_config.mentions.join(" ")}" if @action_config.mentions
