@@ -1,5 +1,3 @@
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
 require 'popper'
 
 RSpec.configure do |config|

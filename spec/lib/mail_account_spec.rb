@@ -33,7 +33,7 @@ describe Popper::MailAccount do
           attachments: [
             {
               pretext: "2015-09-10T16:20:10+09:00",
-              text: "default_condition account_rule_condition_subject",
+              title: "default_condition account_rule_condition_subject",
               color: "good"
             }
           ]
