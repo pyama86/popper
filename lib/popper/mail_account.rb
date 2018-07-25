@@ -47,7 +47,7 @@ module Popper
     def check_and_action(m)
       mail = EncodeMail.new(m.mail)
       Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
-      if rule = match_rule?(mail)
+      match_rule?(mail).each do |rule|
         Popper.log.info "do action:#{mail.subject}"
         Popper::Action::ExecCmd.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
       end
