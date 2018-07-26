@@ -78,8 +78,8 @@ describe Popper::MailAccount do
     end
 
     it { expect(@mail_account.match_rule?(ok_mail)).to be_truthy }
-    it { expect(@mail_account.match_rule?(ng_subject_mail)).to be_falsey }
-    it { expect(@mail_account.match_rule?(ng_body_mail)).to be_falsey }
+    it { expect(@mail_account.match_rule?(ng_subject_mail)).to be_empty }
+    it { expect(@mail_account.match_rule?(ng_body_mail)).to be_empty }
   end
 end
 
