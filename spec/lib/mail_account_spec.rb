@@ -78,6 +78,7 @@ describe Popper::MailAccount do
     end
 
     it { expect(@mail_account.match_rules?(ok_mail)).to be_truthy }
+    it { expect(@mail_account.match_rules?(match_multiple_rules).size).to eq(2) }
     it { expect(@mail_account.match_rules?(ng_subject_mail)).to be_empty }
     it { expect(@mail_account.match_rules?(ng_body_mail)).to be_empty }
   end
@@ -132,3 +133,9 @@ def ng_subject_mail
   mail
 end
 
+def match_multiple_rules
+  mail = EncodeMail.new
+  mail.subject = "test ok"
+  mail.body    = "test match multiple rule"
+  mail
+end
