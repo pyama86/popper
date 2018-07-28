@@ -56,7 +56,7 @@ module Popper
     end
 
     [
-      %w(find_all all?),
+      %w(select all?),
       %w(each each),
     ].each do |arr|
       define_method("rule_with_conditions_#{arr[0]}") do |&blk|

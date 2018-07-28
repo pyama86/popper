@@ -87,7 +87,7 @@ module Popper
     end
 
     def match_rule?(mail)
-      config.rule_with_conditions_find_all do |rule,mail_header,conditions|
+      config.rule_with_conditions_select do |rule,mail_header,conditions|
         conditions.all? do |condition|
           mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
         end
