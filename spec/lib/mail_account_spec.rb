@@ -67,19 +67,19 @@ describe Popper::MailAccount do
     it { expect(@mail_account.run).to be_truthy }
   end
 
-  describe 'match_rule?' do
+  describe 'match_rules?' do
     before do
       options = {}
-      options[:config] = 'spec/fixture/popper_match_rule.conf'
+      options[:config] = 'spec/fixture/popper_match_rules.conf'
       options[:log] = '/tmp/popper.log'
       Popper.load_config(options)
       Popper.init_logger(options)
       @mail_account = described_class.new(Popper.configure.accounts.first)
     end
 
-    it { expect(@mail_account.match_rule?(ok_mail)).to be_truthy }
-    it { expect(@mail_account.match_rule?(ng_subject_mail)).to be_empty }
-    it { expect(@mail_account.match_rule?(ng_body_mail)).to be_empty }
+    it { expect(@mail_account.match_rules?(ok_mail)).to be_truthy }
+    it { expect(@mail_account.match_rules?(ng_subject_mail)).to be_empty }
+    it { expect(@mail_account.match_rules?(ng_body_mail)).to be_empty }
   end
 end
 
