@@ -47,7 +47,7 @@ module Popper
     def check_and_action(m)
       mail = EncodeMail.new(m.mail)
       Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
-      if rule = match_rule?(mail)
+      match_rules?(mail).each do |rule|
         Popper.log.info "do action:#{mail.subject}"
         Popper::Action::ExecCmd.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
       end
@@ -85,8 +85,8 @@ module Popper
       conn.mails.select {|_m|uidl_list.include?(_m.uidl)}
     end
 
-    def match_rule?(mail)
-      config.rule_with_conditions_find do |rule,mail_header,conditions|
+    def match_rules?(mail)
+      config.rule_with_conditions_select do |rule,mail_header,conditions|
         conditions.all? do |condition|
           mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
         end
