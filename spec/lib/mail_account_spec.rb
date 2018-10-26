@@ -2,11 +2,6 @@ require 'spec_helper'
 require 'slack-notifier'
 require 'octokit'
 describe Popper::MailAccount do
-  before do
-    allow(File).to receive(:open).and_yield(Dummy.new)
-    allow(File).to receive(:write).and_return(true)
-  end
-
   describe 'run' do
     before do
       options = {}
@@ -110,32 +105,4 @@ Delivered-To: example@example.com\r\nReceived: (qmail 5075 invoked from network)
     ]
   end
   pop
-end
-
-def ok_mail
-  mail = EncodeMail.new
-  mail.subject = "test ok"
-  mail.body    = "test ok"
-  mail
-end
-
-def ng_body_mail
-  mail = EncodeMail.new
-  mail.subject = "test ok"
-  mail.body    = "test ng"
-  mail
-end
-
-def ng_subject_mail
-  mail = EncodeMail.new
-  mail.subject = "test ng"
-  mail.body    = "test ok"
-  mail
-end
-
-def match_multiple_rules
-  mail = EncodeMail.new
-  mail.subject = "test ok"
-  mail.body    = "test match multiple rule"
-  mail
 end
