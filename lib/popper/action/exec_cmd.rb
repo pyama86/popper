@@ -1,9 +1,19 @@
 require 'bundler'
+require 'tempfile'
 module Popper::Action
   class ExecCmd < Base
     def self.task(mail, params={})
+      tmps = mail.attachments.map do |a|
+        ::Tempfile.open(a.filename) do |f|
+          f.write a.body.decoded
+          f
+        end
+      end unless mail.attachments.empty?
+      cmd = "#{@action_config.cmd} '#{mail.subject}' '#{mail.utf_body}' '#{mail.from.join(";")}' '#{mail.to.join(";")}'"
+      cmd += " #{tmps.map {|t| "'#{t.path}'"}.join(' ')}" if tmps
+
       ::Bundler.with_clean_env do
-        system("#{@action_config.cmd} '#{mail.subject}' '#{mail.utf_body}' '#{mail.from.join(";")}' '#{mail.to.join(";")}'")
+        system(cmd)
       end
       params
     end
