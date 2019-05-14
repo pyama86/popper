@@ -15,12 +15,12 @@ describe Popper::Action::ExecCmd do
       allow_any_instance_of(Tempfile).to receive(:path).and_return("dummy")
       expect_any_instance_of(Object).to receive(:system).with(
         "true " \
-        "'test ok' " \
-        "'test ok' " \
-        "'test@example.com' " \
-        "'test@example.com' " \
-        "'dummy' " \
-        "'dummy'"
+        "test\\ ok " \
+        "test\\ ok " \
+        "test@example.com " \
+        "test@example.com " \
+        "dummy " \
+        "dummy"
       ).and_return(true)
     end
 

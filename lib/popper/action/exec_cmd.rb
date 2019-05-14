@@ -1,4 +1,5 @@
 require 'bundler'
+require 'shellwords'
 require 'tempfile'
 module Popper::Action
   class ExecCmd < Base
@@ -9,9 +10,8 @@ module Popper::Action
           f
         end
       end unless mail.attachments.empty?
-      cmd = "#{@action_config.cmd} '#{mail.subject}' '#{mail.utf_body}' '#{mail.from.join(";")}' '#{mail.to.join(";")}'"
-      cmd += " #{tmps.map {|t| "'#{t.path}'"}.join(' ')}" if tmps
-
+      cmd = "#{@action_config.cmd} #{Shellwords.escape(mail.subject)} #{Shellwords.escape(mail.utf_body)} #{Shellwords.escape(mail.from.join(";"))} #{Shellwords.escape(mail.to.join(";"))}"
+      cmd += " #{tmps.map {|t| Shellwords.escape(t.path) }.join(' ')}" if tmps && !tmps.empty?
       ::Bundler.with_clean_env do
         system(cmd)
       end
