@@ -4,4 +4,5 @@ module Popper::Action
   autoload :Ghe,     "popper/action/ghe"
   autoload :Git,     "popper/action/git"
   autoload :ExecCmd, "popper/action/exec_cmd"
+  autoload :Webhook, "popper/action/webhook"
 end
