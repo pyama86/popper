@@ -55,6 +55,13 @@ describe Popper::MailAccount do
         { html_url: "https://test.ghe.com/v3/issues/#123" }
       )
 
+      # Webhook
+      allow(Popper::Action::Webhook).to receive(:post!).with(
+        "https://localhost:12345/webhook/event",
+        "default_condition account_rule_condition_subject",
+        "account_default_condition account_rule_condition_body\n"
+      ).and_return("ok")
+
       @mail_account = described_class.new(Popper.configure.accounts.first)
       @mail_account.instance_variable_set(:@complete_list, [1])
     end
