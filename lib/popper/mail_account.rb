@@ -49,7 +49,7 @@ module Popper
       Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
       match_rules?(mail).each do |rule|
         Popper.log.info "do action:#{mail.subject}"
-        Popper::Action::ExecCmd.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
+        Popper::Action::Webhook.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
       end
 
       m.uidl

@@ -19,5 +19,7 @@ module Popper::Action
         "Content-Type" => "application/json"
       )
     end
+
+    next_action(ExecCmd)
   end
 end
