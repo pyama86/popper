@@ -42,13 +42,13 @@ module Popper
 
   class AccountAttributes < OpenStruct
     def initialize(hash = nil)
+      super
       @table = {}
       @hash = hash
 
       if hash
         hash.each do |k, v|
           @table[k.to_sym] = (v.is_a?(Hash) ? self.class.new(v) : v)
-          #     new_ostruct_member(k)
         end
       end
     end
