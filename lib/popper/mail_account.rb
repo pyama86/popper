@@ -16,8 +16,8 @@ module Popper
         self.complete_list = current_list unless complete_list
         pop(conn)
       end
-      rescue => e
-        Popper.log.warn e
+    rescue StandardError => e
+      Popper.log.warn e
     end
 
     def pop(conn)
@@ -27,17 +27,15 @@ module Popper
       Popper.log.info "start popper #{config.name}"
 
       process_uidl_list(conn).each do |m|
-        begin
-          done_uidls << check_and_action(m)
-          m.delete if config.login.respond_to?(:delete_after) && config.login.delete_after
-        rescue Net::POPError => e
-          self.complete_list += done_uidls
-          Popper.log.warn "pop err write uidl"
-          return
-        rescue => e
-          error_uidls << m.uidl
-          Popper.log.warn e
-        end
+        done_uidls << check_and_action(m)
+        m.delete if config.login.respond_to?(:delete_after) && config.login.delete_after
+      rescue Net::POPError => e
+        self.complete_list += done_uidls
+        Popper.log.warn 'pop err write uidl'
+        return
+      rescue StandardError => e
+        error_uidls << m.uidl
+        Popper.log.warn e
       end
 
       self.complete_list = current_list - error_uidls
@@ -46,7 +44,7 @@ module Popper
 
     def check_and_action(m)
       mail = EncodeMail.new(m.mail)
-      Popper.log.info "check mail:#{mail.date.to_s} #{mail.subject}"
+      Popper.log.info "check mail:#{mail.date} #{mail.subject}"
       match_rules?(mail).each do |rule|
         Popper.log.info "do action:#{mail.subject}"
         Popper::Action::Webhook.run(config.action_by_rule(rule), mail) if config.action_by_rule(rule)
@@ -71,10 +69,10 @@ module Popper
 
     def set_pop_option(pop)
       pop.enable_ssl if config.login.respond_to?(:ssl) && config.login.ssl
-      %w(
+      %w[
         open_timeout
         read_timeout
-      ).each do |m|
+      ].each do |m|
         pop.instance_variable_set("@#{m}", ENV['POP_TIMEOUT'] || 120)
       end
       pop
@@ -82,11 +80,11 @@ module Popper
 
     def process_uidl_list(conn)
       uidl_list = current_list - complete_list
-      conn.mails.select {|_m|uidl_list.include?(_m.uidl)}
+      conn.mails.select { |_m| uidl_list.include?(_m.uidl) }
     end
 
     def match_rules?(mail)
-      config.rule_with_conditions_select do |rule,mail_header,conditions|
+      config.rule_with_conditions_select do |_rule, mail_header, conditions|
         conditions.all? do |condition|
           mail.respond_to?(mail_header) && mail.send(mail_header).to_s.match(/#{condition}/)
         end
@@ -97,12 +95,20 @@ end
 
 class ::Hash
   def deep_merge(second)
-    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : Array === v1 && Array === v2 ? v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
-    self.merge(second.to_h, &merger)
+    merger = proc { |_key, v1, v2|
+      if v1.is_a?(Hash) && v2.is_a?(Hash)
+        v1.merge(v2, &merger)
+      elsif v1.is_a?(Array) && v2.is_a?(Array)
+        v1 | v2
+      else
+        [:undefined, nil, :nil].include?(v2) ? v1 : v2
+      end
+    }
+    merge(second.to_h, &merger)
   end
 
   def deep_merge!(second)
-    self.merge!(deep_merge(second))
+    merge!(deep_merge(second))
   end
 end
 
@@ -113,13 +119,11 @@ class EncodeMail < Mail::Message
 
   def utf_body
     if multipart?
-      if text_part
-        text_part.decoded.encode("UTF-8", charset)
-      elsif html_part
-        html_part.decoded.encode("UTF-8", charset)
-      end
+      parts.map do |part|
+        part.body.decoded.encode('UTF-8', charset) unless part.attachment?
+      end.join
     else
-      body.decoded.encode("UTF-8", charset)
+      body.decoded.encode('UTF-8', charset)
     end
   end
 end
