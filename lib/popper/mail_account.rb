@@ -120,10 +120,10 @@ class EncodeMail < Mail::Message
   def utf_body
     if multipart?
       parts.map do |part|
-        part.body.decoded.encode('UTF-8', charset) unless part.attachment?
+        part.body.decoded.encode('UTF-8', charset, undef: :replace, invalid: :replace, replace: '') unless part.attachment?
       end.join
     else
-      body.decoded.encode('UTF-8', charset)
+      body.decoded.encode('UTF-8', charset, undef: :replace, invalid: :replace, replace: '')
     end
   end
 end
