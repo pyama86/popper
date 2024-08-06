@@ -7,13 +7,13 @@ module Popper
     attr_accessor :config, :current_list, :complete_list
 
     def initialize(config)
-      self.config = config
+      @config = config
     end
 
     def run
       session_start do |conn|
-        self.current_list = conn.mails.map(&:uidl)
-        self.complete_list = current_list unless complete_list
+        @current_list = conn.mails.map(&:uidl)
+        @complete_list ||= @current_list
         pop(conn)
       end
     rescue StandardError => e
@@ -27,10 +27,12 @@ module Popper
       Popper.log.info "start popper #{config.name}"
 
       process_uidl_list(conn).each do |m|
+        uidl = m.uidl
+        Popper.log.info "pop mail:#{uidl}"
         done_uidls << check_and_action(m)
         m.delete if config.login.respond_to?(:delete_after) && config.login.delete_after
       rescue Net::POPError => e
-        self.complete_list += done_uidls
+        @complete_list += done_uidls
         Popper.log.warn 'pop err write uidl'
         return
       rescue StandardError => e
@@ -38,8 +40,8 @@ module Popper
         Popper.log.warn e
       end
 
-      self.complete_list = current_list - error_uidls
-      Popper.log.info "success popper #{config.name}"
+      @complete_list = @current_list - error_uidls
+      Popper.log.info "success popper #{config.name} current_list:#{@current_list.size} complete_list:#{@complete_list.size}"
     end
 
     def check_and_action(m)
@@ -79,7 +81,7 @@ module Popper
     end
 
     def process_uidl_list(conn)
-      uidl_list = current_list - complete_list
+      uidl_list = @current_list - @complete_list
       conn.mails.select { |_m| uidl_list.include?(_m.uidl) }
     end
 
